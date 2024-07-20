@@ -32,18 +32,20 @@ pub fn system_boid_separation(
 }
 
 const VISIBILITY_RADIUS_2: f32 = 200.0 * 200.0;
-const ALIGN_FACTOR: f32 = 0.1;
-pub fn system_boid_alignment(
+const ALIGN_FACTOR: f32 = 0.05;
+const COHESION_FACTOR: f32 = 0.01;
+pub fn system_boid_alignment_and_cohesion(
     mut queries: ParamSet<(
         Query<(Entity, &Velocity, &Transform), With<Boid>>,
-        Query<(Entity, &mut Velocity), With<Boid>>,
+        Query<(Entity, &mut Velocity, &Transform), With<Boid>>,
     )>,
 ) {
-    let mut velocity_map: HashMap<Entity, Vec2> = Default::default();
+    let mut velocity_and_pos_avg_map: HashMap<Entity, (Vec2, Vec2)> = Default::default();
 
     let query = queries.p0();
     for (entity, _, transform) in query.iter() {
         let mut velocity_average: Vec2 = Vec2::ZERO;
+        let mut position_average: Vec2 = Vec2::ZERO;
         let mut neighbors: i32 = 0;
 
         for (other_entity, other_velocity, other_transform) in query.iter() {
@@ -57,6 +59,7 @@ pub fn system_boid_alignment(
             }
 
             velocity_average += other_velocity.0;
+            position_average += other_transform.translation.xy();
             neighbors += 1;
         }
 
@@ -64,12 +67,14 @@ pub fn system_boid_alignment(
             continue;
         }
         velocity_average /= neighbors as f32;
-        velocity_map.insert(entity, velocity_average * ALIGN_FACTOR);
+        position_average /= neighbors as f32;
+        velocity_and_pos_avg_map.insert(entity, (velocity_average, position_average));
     }
 
-    for (entity, mut velocity) in queries.p1().iter_mut() {
-        if let Some(velocity_addition) = velocity_map.get(&entity) {
-            velocity.0 += *velocity_addition;
+    for (entity, mut velocity, transform) in queries.p1().iter_mut() {
+        if let Some((velocity_addition, position_average)) = velocity_and_pos_avg_map.get(&entity) {
+            velocity.0 += *velocity_addition * ALIGN_FACTOR;
+            velocity.0 += (*position_average - transform.translation.xy()) * COHESION_FACTOR;
         }
     }
 }
