@@ -5,8 +5,8 @@ use bevy::utils::HashMap;
 #[derive(Component)]
 pub struct Boid;
 
-const PROTECTED_RADIUS_2: f32 = 100.0 * 100.0;
-const AVOID_FACTOR: f32 = 0.1;
+const PROTECTED_RADIUS_2: f32 = 50.0 * 50.0;
+const AVOID_FACTOR: f32 = 0.2;
 pub fn system_boid_separation(
     transform_query: Query<(Entity, &Transform), With<Boid>>,
     mut velocity_query: Query<(Entity, &mut Velocity), With<Boid>>,
@@ -31,7 +31,7 @@ pub fn system_boid_separation(
     }
 }
 
-const VISIBILITY_RADIUS_2: f32 = 200.0 * 200.0;
+const VISIBILITY_RADIUS_2: f32 = 100.0 * 100.0;
 const ALIGN_FACTOR: f32 = 0.05;
 const COHESION_FACTOR: f32 = 0.01;
 pub fn system_boid_alignment_and_cohesion(

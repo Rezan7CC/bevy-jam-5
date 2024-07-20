@@ -3,7 +3,7 @@ use crate::movement;
 use bevy::prelude::*;
 
 pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>) {
-    for _ in 0..10 {
+    for _ in 0..100 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,
