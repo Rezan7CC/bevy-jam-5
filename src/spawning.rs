@@ -27,5 +27,5 @@ fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetS
             ..Default::default()
         },
         ..Default::default()
-    }).insert(movement::Velocity { 0: velocity });
+    }).insert(movement::Velocity(velocity));
 }
