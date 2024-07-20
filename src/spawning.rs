@@ -4,8 +4,8 @@ use crate::movement;
 pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>) {
     for _ in 0..10 {
         let position = Vec2::new(
-        rand::random::<f32>() * 800.0 - 400.0,
-        rand::random::<f32>() * 600.0 - 300.0,
+            rand::random::<f32>() * 800.0 - 400.0,
+            rand::random::<f32>() * 600.0 - 300.0,
         );
         spawn_boid(position, &mut commands, &asset_server);
     }
