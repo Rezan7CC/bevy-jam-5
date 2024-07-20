@@ -1,5 +1,6 @@
-﻿use bevy::prelude::*;
+use crate::boid::Boid;
 use crate::movement;
+use bevy::prelude::*;
 
 pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>) {
     for _ in 0..10 {
@@ -11,21 +12,21 @@ pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>
     }
 }
 
-fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>)
-{
-    let random_direction = Vec2::new(
-        rand::random::<f32>() - 0.5,
-        rand::random::<f32>() - 0.5,
-    ).normalize();
+fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>) {
+    let random_direction =
+        Vec2::new(rand::random::<f32>() - 0.5, rand::random::<f32>() - 0.5).normalize();
     let velocity = random_direction * movement::MIN_VELOCITY;
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("ducky.png"),
-        transform: Transform {
-            translation: position.extend(0.0),
-            scale: Vec3::splat(0.25),
+    commands
+        .spawn(SpriteBundle {
+            texture: asset_server.load("ducky.png"),
+            transform: Transform {
+                translation: position.extend(0.0),
+                scale: Vec3::splat(0.25),
+                ..Default::default()
+            },
             ..Default::default()
-        },
-        ..Default::default()
-    }).insert(movement::Velocity(velocity));
+        })
+        .insert(movement::Velocity(velocity))
+        .insert(Boid);
 }

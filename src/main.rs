@@ -4,8 +4,9 @@
 // Feel free to delete this line.
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
-mod spawning;
+mod boid;
 mod movement;
+mod spawning;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
@@ -20,7 +21,14 @@ fn main() {
             ..default()
         }))
         .add_systems(Startup, (setup, spawning::system_spawn_boids))
-        .add_systems(Update, (movement::system_movement, movement::system_update_velocity))
+        .add_systems(
+            Update,
+            (
+                boid::system_boid_separation,
+                movement::system_update_velocity.after(boid::system_boid_separation),
+                movement::system_movement.after(movement::system_update_velocity),
+            ),
+        )
         .run();
 }
 

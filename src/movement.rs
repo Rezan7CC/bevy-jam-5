@@ -1,4 +1,3 @@
-﻿use bevy::math::Vec2;
 use bevy::prelude::*;
 
 pub const MIN_VELOCITY: f32 = 50.0;
