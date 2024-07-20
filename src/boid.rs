@@ -1,5 +1,6 @@
 use crate::movement::Velocity;
 use bevy::prelude::*;
+use bevy::utils::HashMap;
 
 #[derive(Component)]
 pub struct Boid;
@@ -27,5 +28,48 @@ pub fn system_boid_separation(
         }
 
         velocity_query.get_mut(entity).unwrap().1 .0 += avoid_vector * AVOID_FACTOR;
+    }
+}
+
+const VISIBILITY_RADIUS_2: f32 = 200.0 * 200.0;
+const ALIGN_FACTOR: f32 = 0.1;
+pub fn system_boid_alignment(
+    mut queries: ParamSet<(
+        Query<(Entity, &Velocity, &Transform), With<Boid>>,
+        Query<(Entity, &mut Velocity), With<Boid>>,
+    )>,
+) {
+    let mut velocity_map: HashMap<Entity, Vec2> = Default::default();
+
+    let query = queries.p0();
+    for (entity, _, transform) in query.iter() {
+        let mut velocity_average: Vec2 = Vec2::ZERO;
+        let mut neighbors: i32 = 0;
+
+        for (other_entity, other_velocity, other_transform) in query.iter() {
+            if entity == other_entity {
+                continue;
+            }
+            if (transform.translation.xy() - other_transform.translation.xy()).length_squared()
+                > VISIBILITY_RADIUS_2
+            {
+                continue;
+            }
+
+            velocity_average += other_velocity.0;
+            neighbors += 1;
+        }
+
+        if neighbors == 0 {
+            continue;
+        }
+        velocity_average /= neighbors as f32;
+        velocity_map.insert(entity, velocity_average * ALIGN_FACTOR);
+    }
+
+    for (entity, mut velocity) in queries.p1().iter_mut() {
+        if let Some(velocity_addition) = velocity_map.get(&entity) {
+            velocity.0 += *velocity_addition;
+        }
     }
 }

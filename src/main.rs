@@ -25,7 +25,8 @@ fn main() {
             Update,
             (
                 boid::system_boid_separation,
-                movement::system_update_velocity.after(boid::system_boid_separation),
+                boid::system_boid_alignment.after(boid::system_boid_separation),
+                movement::system_update_velocity.after(boid::system_boid_alignment),
                 movement::system_movement.after(movement::system_update_velocity),
             ),
         )
