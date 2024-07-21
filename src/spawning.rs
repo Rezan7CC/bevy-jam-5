@@ -11,7 +11,7 @@ pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>
     }
 }
 
-fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>) {
+pub fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>) {
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("egg.png"),

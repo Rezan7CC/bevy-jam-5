@@ -30,6 +30,7 @@ fn main() {
                 life_cycles::system_hatch_eggs,
                 life_cycles::system_duckling_to_juvenile,
                 life_cycles::system_juvenile_to_adult,
+                life_cycles::system_breeding,
                 boid::system_boid_separation,
                 boid::system_boid_alignment_and_cohesion
                     .after(boid::system_boid_separation)
