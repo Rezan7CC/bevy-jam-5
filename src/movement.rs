@@ -26,7 +26,11 @@ pub fn system_avoid_edges(
     mut query: Query<(&mut Velocity, &Transform)>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
-    let window = window_query.single();
+    let window = if let Ok(window) = window_query.get_single() {
+        window
+    } else {
+        return;
+    };
     let window_width = window.width();
     let window_height = window.height();
 

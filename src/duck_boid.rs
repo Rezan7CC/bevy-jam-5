@@ -1,6 +1,6 @@
 use crate::boid::Boid;
 use crate::movement::Velocity;
-use crate::{boid, life_cycles};
+use crate::{boid, food, life_cycles};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 
@@ -135,6 +135,40 @@ pub fn system_boid_mating_attraction(
             let direction =
                 (entry.biggest_adult_group.unwrap().0 - transform.translation.xy()).normalize();
             velocity.0 -= direction * AVOID_ADULT_GROUP_FACTOR * time.delta_seconds();
+        }
+    }
+}
+
+const FOOD_VISIBILITY_RADIUS_2: f32 = boid::VISIBILITY_RADIUS_2;
+const FOOD_EATING_RADIUS_2: f32 = 10.0 * 10.0;
+const TOWARDS_FOOD_FACTOR: f32 = 200.0;
+pub fn system_boids_food(
+    time: Res<Time>,
+    mut commands: Commands,
+    food_query: Query<(Entity, &Transform), With<food::Food>>,
+    mut duck_query: Query<(&Transform, &mut Velocity), With<Boid>>,
+) {
+    for (duck_transform, mut duck_velocity) in duck_query.iter_mut() {
+        let mut closest_food: Option<(Vec2, f32, Entity)> = None;
+        for (entity, food_transform) in food_query.iter() {
+            let distance_2 = (duck_transform.translation.xy() - food_transform.translation.xy())
+                .length_squared();
+            if distance_2 < FOOD_VISIBILITY_RADIUS_2
+                && (closest_food.is_none() || distance_2 < closest_food.unwrap().1)
+            {
+                closest_food = Some((food_transform.translation.xy(), distance_2, entity));
+            }
+        }
+
+        if closest_food.is_some() {
+            let closet_food_distance_2 = closest_food.unwrap().1;
+            if closet_food_distance_2 <= FOOD_EATING_RADIUS_2 {
+                commands.entity(closest_food.unwrap().2).despawn();
+                continue;
+            }
+
+            let direction = (closest_food.unwrap().0 - duck_transform.translation.xy()).normalize();
+            duck_velocity.0 += direction * TOWARDS_FOOD_FACTOR * time.delta_seconds();
         }
     }
 }

@@ -51,6 +51,7 @@ fn main() {
                     .after(boid::system_boid_separation)
                     .before(movement::system_clamp_velocity),
                 duck_boid::system_boid_update_close_adults,
+                duck_boid::system_boids_food.before(movement::system_clamp_velocity),
                 duck_boid::system_boid_mating_attraction
                     .after(duck_boid::system_boid_update_close_adults)
                     .before(movement::system_clamp_velocity),
