@@ -31,7 +31,7 @@ pub fn system_boid_separation(
     }
 }
 
-const VISIBILITY_RADIUS_2: f32 = 100.0 * 100.0;
+pub(crate) const VISIBILITY_RADIUS_2: f32 = 150.0 * 150.0;
 const ALIGN_FACTOR: f32 = 0.05;
 const COHESION_FACTOR: f32 = 0.01;
 pub fn system_boid_alignment_and_cohesion(

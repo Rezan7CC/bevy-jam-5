@@ -5,6 +5,7 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 mod boid;
+mod duck_boid;
 mod life_cycles;
 mod movement;
 mod spawning;
@@ -30,8 +31,14 @@ fn main() {
                 life_cycles::system_duckling_to_juvenile,
                 life_cycles::system_juvenile_to_adult,
                 boid::system_boid_separation,
-                boid::system_boid_alignment_and_cohesion.after(boid::system_boid_separation),
-                movement::system_clamp_velocity.after(boid::system_boid_alignment_and_cohesion),
+                boid::system_boid_alignment_and_cohesion
+                    .after(boid::system_boid_separation)
+                    .before(movement::system_clamp_velocity),
+                duck_boid::system_boid_update_close_adults,
+                duck_boid::system_boid_mating_attraction
+                    .after(duck_boid::system_boid_update_close_adults)
+                    .before(movement::system_clamp_velocity),
+                movement::system_clamp_velocity,
                 movement::system_avoid_edges.after(movement::system_clamp_velocity),
                 movement::system_movement.after(movement::system_avoid_edges),
             ),

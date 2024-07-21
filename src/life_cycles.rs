@@ -1,5 +1,5 @@
 use crate::boid::Boid;
-use crate::{movement, spawning};
+use crate::{duck_boid, movement, spawning};
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -114,6 +114,9 @@ pub fn system_juvenile_to_adult(
         if transitioned {
             commands.entity(entity).remove::<Juvenile>();
             commands.entity(entity).insert(Adult);
+            commands
+                .entity(entity)
+                .insert(duck_boid::CloseAdults::default());
         }
     }
 }
