@@ -17,7 +17,7 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<As
         .spawn(SpriteBundle {
             texture: asset_server.load("egg.png"),
             transform: Transform {
-                translation: position.extend(0.0),
+                translation: position.extend(-1.0),
                 scale: Vec3::splat(0.25),
                 ..Default::default()
             },
@@ -46,7 +46,7 @@ pub fn spawn_food(position: Vec2, commands: &mut Commands, asset_server: &Res<As
         .spawn(SpriteBundle {
             texture: asset_server.load(sprite_path),
             transform: Transform {
-                translation: position.extend(0.0),
+                translation: position.extend(-2.0),
                 scale: Vec3::splat(1.0),
                 rotation: Quat::from_rotation_z(rand::random::<f32>() * std::f32::consts::PI),
             },
