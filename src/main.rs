@@ -6,6 +6,7 @@
 
 mod boid;
 mod duck_boid;
+mod food;
 mod life_cycles;
 mod movement;
 mod spawning;
@@ -15,13 +16,27 @@ use bevy::prelude::*;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            // Wasm builds will check for meta files (that don't exist) if this isn't set.
-            // This causes errors and even panics in web builds on itch.
-            // See https://github.com/bevyengine/bevy_github_ci_template/issues/48.
-            meta_check: AssetMetaCheck::Never,
-            ..default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(AssetPlugin {
+                    // Wasm builds will check for meta files (that don't exist) if this isn't set.
+                    // This causes errors and even panics in web builds on itch.
+                    // See https://github.com/bevyengine/bevy_github_ci_template/issues/48.
+                    meta_check: AssetMetaCheck::Never,
+                    ..default()
+                })
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "Duck Boids".to_string(),
+                        ..Default::default()
+                    }),
+                    ..Default::default()
+                }),
+        )
+        .insert_resource(food::FoodPlacementTimer(Timer::from_seconds(
+            food::FOOD_PLACEMENT_COOLDOWN,
+            TimerMode::Once,
+        )))
         .add_systems(Startup, (setup, spawning::system_spawn_boids))
         .add_systems(
             Update,
@@ -42,6 +57,7 @@ fn main() {
                 movement::system_clamp_velocity,
                 movement::system_avoid_edges.after(movement::system_clamp_velocity),
                 movement::system_movement.after(movement::system_avoid_edges),
+                food::system_place_food_on_input,
             ),
         )
         .run();
