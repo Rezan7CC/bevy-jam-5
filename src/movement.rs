@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-pub const MIN_VELOCITY: f32 = 50.0;
+pub const MIN_VELOCITY: f32 = 40.0;
 pub const MAX_VELOCITY: f32 = 100.0;
 
 #[derive(Component, Default)]
@@ -45,6 +45,17 @@ pub fn system_avoid_edges(
             velocity.0.y += TURN_FACTOR * time.delta_seconds();
         } else if transform.translation.y > window_height * 0.5 - EDGE_MARGIN {
             velocity.0.y -= TURN_FACTOR * time.delta_seconds();
+        }
+    }
+}
+
+const FLIP_VELOCITY_THRESHOLD: f32 = 50.0;
+pub fn system_flip_based_on_velocity(mut query: Query<(&Velocity, &mut Transform)>) {
+    for (velocity, mut transform) in query.iter_mut() {
+        if velocity.0.x > FLIP_VELOCITY_THRESHOLD {
+            transform.scale.x = transform.scale.x.abs();
+        } else if velocity.0.x < -FLIP_VELOCITY_THRESHOLD {
+            transform.scale.x = -transform.scale.x.abs();
         }
     }
 }

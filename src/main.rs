@@ -56,6 +56,7 @@ fn main() {
                     .after(duck_boid::system_boid_update_close_adults)
                     .before(movement::system_clamp_velocity),
                 movement::system_clamp_velocity,
+                movement::system_flip_based_on_velocity,
                 movement::system_avoid_edges.after(movement::system_clamp_velocity),
                 movement::system_movement.after(movement::system_avoid_edges),
                 food::system_place_food_on_input,
