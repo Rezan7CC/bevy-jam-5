@@ -13,7 +13,7 @@ pub fn system_movement(time: Res<Time>, mut query: Query<(&Velocity, &mut Transf
     }
 }
 
-pub fn system_update_velocity(mut query: Query<&mut Velocity>) {
+pub fn system_clamp_velocity(mut query: Query<&mut Velocity>) {
     for mut velocity in query.iter_mut() {
         velocity.0 = velocity.0.clamp_length(MIN_VELOCITY, MAX_VELOCITY);
     }
