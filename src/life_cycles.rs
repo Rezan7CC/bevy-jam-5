@@ -54,7 +54,15 @@ fn transition_life_cycle(
 pub fn system_hatch_eggs(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut query: Query<(Entity, &mut Transform, &mut LifeCycleTime, &mut Handle<Image>), With<Egg>>,
+    mut query: Query<
+        (
+            Entity,
+            &mut Transform,
+            &mut LifeCycleTime,
+            &mut Handle<Image>,
+        ),
+        With<Egg>,
+    >,
 ) {
     for (entity, mut transform, mut life_cycle_time, mut entity_image) in query.iter_mut() {
         let transitioned = transition_life_cycle(
@@ -84,7 +92,15 @@ pub fn system_hatch_eggs(
 pub fn system_duckling_to_juvenile(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut query: Query<(Entity, &mut Transform, &mut LifeCycleTime, &mut Handle<Image>), With<Duckling>>,
+    mut query: Query<
+        (
+            Entity,
+            &mut Transform,
+            &mut LifeCycleTime,
+            &mut Handle<Image>,
+        ),
+        With<Duckling>,
+    >,
 ) {
     for (entity, mut transform, mut life_cycle_time, mut entity_image) in query.iter_mut() {
         let transitioned = transition_life_cycle(
@@ -108,7 +124,15 @@ pub fn system_duckling_to_juvenile(
 pub fn system_juvenile_to_adult(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut query: Query<(Entity, &mut Transform, &mut LifeCycleTime, &mut Handle<Image>), With<Juvenile>>,
+    mut query: Query<
+        (
+            Entity,
+            &mut Transform,
+            &mut LifeCycleTime,
+            &mut Handle<Image>,
+        ),
+        With<Juvenile>,
+    >,
 ) {
     for (entity, mut transform, mut life_cycle_time, mut entity_image) in query.iter_mut() {
         let transitioned = transition_life_cycle(
