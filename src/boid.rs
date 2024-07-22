@@ -6,8 +6,9 @@ use bevy::utils::HashMap;
 pub struct Boid;
 
 const PROTECTED_RADIUS_2: f32 = 50.0 * 50.0;
-const AVOID_FACTOR: f32 = 0.2;
+const AVOID_FACTOR: f32 = 0.35;
 pub fn system_boid_separation(
+    time: Res<Time>,
     transform_query: Query<(Entity, &Transform), With<Boid>>,
     mut velocity_query: Query<(Entity, &mut Velocity), With<Boid>>,
 ) {
@@ -27,14 +28,16 @@ pub fn system_boid_separation(
             avoid_vector += transform.translation.xy() - other_transform.translation.xy();
         }
 
-        velocity_query.get_mut(entity).unwrap().1 .0 += avoid_vector * AVOID_FACTOR;
+        velocity_query.get_mut(entity).unwrap().1 .0 +=
+            avoid_vector * AVOID_FACTOR * time.delta_seconds();
     }
 }
 
-pub(crate) const VISIBILITY_RADIUS_2: f32 = 150.0 * 150.0;
-const ALIGN_FACTOR: f32 = 0.05;
-const COHESION_FACTOR: f32 = 0.01;
+pub const VISIBILITY_RADIUS_2: f32 = 100.0 * 100.0;
+const ALIGN_FACTOR: f32 = 0.5;
+const COHESION_FACTOR: f32 = 0.25;
 pub fn system_boid_alignment_and_cohesion(
+    time: Res<Time>,
     mut queries: ParamSet<(
         Query<(Entity, &Velocity, &Transform), With<Boid>>,
         Query<(Entity, &mut Velocity, &Transform), With<Boid>>,
@@ -73,8 +76,10 @@ pub fn system_boid_alignment_and_cohesion(
 
     for (entity, mut velocity, transform) in queries.p1().iter_mut() {
         if let Some((velocity_addition, position_average)) = velocity_and_pos_avg_map.get(&entity) {
-            velocity.0 += *velocity_addition * ALIGN_FACTOR;
-            velocity.0 += (*position_average - transform.translation.xy()) * COHESION_FACTOR;
+            velocity.0 += *velocity_addition * ALIGN_FACTOR * time.delta_seconds();
+            velocity.0 += (*position_average - transform.translation.xy())
+                * COHESION_FACTOR
+                * time.delta_seconds();
         }
     }
 }

@@ -43,8 +43,8 @@ pub fn system_boid_update_close_adults(
 
 const MATING_VISIBILITY_RADIUS_2: f32 = boid::VISIBILITY_RADIUS_2;
 const MATING_MIN_DISTANCE_2: f32 = 20.0 * 20.0;
-const TOWARDS_LONELY_ADULT_FACTOR: f32 = 400.0;
-const AVOID_ADULT_GROUP_FACTOR: f32 = 400.0;
+const TOWARDS_LONELY_ADULT_FACTOR: f32 = 0.4;
+const AVOID_ADULT_GROUP_FACTOR: f32 = 0.4;
 
 #[derive(Default)]
 struct CloseAdultsMapEntry {
@@ -141,7 +141,7 @@ pub fn system_boid_mating_attraction(
 
 const FOOD_VISIBILITY_RADIUS_2: f32 = boid::VISIBILITY_RADIUS_2;
 const FOOD_EATING_RADIUS_2: f32 = 10.0 * 10.0;
-const TOWARDS_FOOD_FACTOR: f32 = 200.0;
+const TOWARDS_FOOD_FACTOR: f32 = 0.2;
 pub fn system_boids_food(
     time: Res<Time>,
     mut commands: Commands,
@@ -173,7 +173,7 @@ pub fn system_boids_food(
     }
 }
 
-const TOWARDS_ADULT_FACTOR: f32 = 100.0;
+const TOWARDS_ADULT_FACTOR: f32 = 0.2;
 pub fn system_boids_ducklings_towards_adults(
     time: Res<Time>,
     mut duckling_query: Query<

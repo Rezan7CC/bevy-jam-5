@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-pub const MIN_VELOCITY: f32 = 40.0;
-pub const MAX_VELOCITY: f32 = 100.0;
+pub const MIN_VELOCITY: f32 = 50.0;
+pub const MAX_VELOCITY: f32 = 150.0;
 
 #[derive(Component, Default)]
 pub struct Velocity(pub Vec2);
@@ -20,7 +20,7 @@ pub fn system_clamp_velocity(mut query: Query<&mut Velocity>) {
 }
 
 const EDGE_MARGIN: f32 = 100.0;
-const TURN_FACTOR: f32 = 200.0;
+const TURN_FACTOR: f32 = 130.0;
 pub fn system_avoid_edges(
     time: Res<Time>,
     mut query: Query<(&mut Velocity, &Transform)>,
