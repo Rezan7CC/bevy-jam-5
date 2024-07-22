@@ -1,5 +1,4 @@
 use crate::boid::Boid;
-use crate::duck_boid::CloseAdults;
 use crate::{duck_boid, movement, spawning};
 use bevy::prelude::*;
 
@@ -15,7 +14,7 @@ pub struct Adult;
 #[derive(Component, Default)]
 pub struct LifeCycleTime(pub f32);
 
-const TIME_FACTOR: f32 = 1.0;
+pub const TIME_FACTOR: f32 = 0.2;
 pub const EGG_HATCH_TIME_MIN: f32 = 10.0 * TIME_FACTOR;
 pub const EGG_HATCH_TIME_MAX: f32 = 30.0 * TIME_FACTOR;
 
@@ -152,32 +151,6 @@ pub fn system_juvenile_to_adult(
             commands
                 .entity(entity)
                 .insert(duck_boid::CloseAdults::default());
-            commands.entity(entity).insert(BreedingProgress::default());
-        }
-    }
-}
-
-#[derive(Component, Default)]
-pub struct BreedingProgress(pub f32);
-
-pub const BREEDING_DURATION: f32 = 10.0 * TIME_FACTOR;
-
-pub fn system_breeding(
-    time: Res<Time>,
-    asset_server: Res<AssetServer>,
-    mut commands: Commands,
-    mut query: Query<(&Transform, &mut BreedingProgress, &CloseAdults), With<Adult>>,
-) {
-    for (transform, mut breeding_progress, close_adults) in query.iter_mut() {
-        if close_adults.0.is_empty() {
-            continue;
-        }
-        breeding_progress.0 += time.delta_seconds();
-
-        if breeding_progress.0 >= BREEDING_DURATION {
-            spawning::spawn_boid(transform.translation.xy(), &mut commands, &asset_server);
-
-            breeding_progress.0 = 0.0;
         }
     }
 }

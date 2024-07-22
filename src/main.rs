@@ -5,11 +5,13 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 mod boid;
+mod breeding;
 mod duck_boid;
 mod food;
 mod life_cycles;
 mod movement;
 mod spawning;
+mod sprite_animation;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
@@ -45,7 +47,11 @@ fn main() {
                 life_cycles::system_hatch_eggs,
                 life_cycles::system_duckling_to_juvenile,
                 life_cycles::system_juvenile_to_adult,
-                life_cycles::system_breeding,
+                breeding::system_build_relationships,
+                breeding::system_update_relationships
+                    .after(breeding::system_build_relationships)
+                    .after(movement::system_movement),
+                breeding::system_breeding,
                 boid::system_boid_separation,
                 boid::system_boid_alignment_and_cohesion
                     .after(boid::system_boid_separation)
@@ -60,6 +66,7 @@ fn main() {
                 movement::system_avoid_edges.after(movement::system_clamp_velocity),
                 movement::system_movement.after(movement::system_avoid_edges),
                 food::system_place_food_on_input,
+                sprite_animation::system_animate_sprites.after(movement::system_movement),
             ),
         )
         .run();

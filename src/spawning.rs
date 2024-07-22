@@ -1,5 +1,5 @@
 use crate::food::Food;
-use crate::life_cycles;
+use crate::{life_cycles, sprite_animation};
 use bevy::prelude::*;
 
 pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -62,4 +62,35 @@ pub fn switch_sprite(
 ) {
     let new_image_handle = asset_server.load(sprite_path);
     *entity_image = new_image_handle;
+}
+
+pub fn spawn_relationship_sprite(
+    entity: Entity,
+    position: Vec2,
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
+) {
+    let texture = asset_server.load("heart_sprite_sheet.png");
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 4, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+
+    let animation_indices = sprite_animation::AnimationIndices { first: 0, last: 3 };
+    commands.entity(entity).insert((
+        SpriteBundle {
+            transform: Transform {
+                translation: position.extend(5.0),
+                scale: Vec3::splat(0.5),
+                ..Default::default()
+            },
+            texture,
+            ..default()
+        },
+        TextureAtlas {
+            layout: texture_atlas_layout,
+            index: animation_indices.first,
+        },
+        animation_indices,
+        sprite_animation::AnimationTimer(Timer::from_seconds(0.25, TimerMode::Repeating)),
+    ));
 }
