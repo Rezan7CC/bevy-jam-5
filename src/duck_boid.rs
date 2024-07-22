@@ -172,3 +172,33 @@ pub fn system_boids_food(
         }
     }
 }
+
+const TOWARDS_ADULT_FACTOR: f32 = 100.0;
+pub fn system_boids_ducklings_towards_adults(
+    time: Res<Time>,
+    mut duckling_query: Query<
+        (&Transform, &mut Velocity),
+        (With<life_cycles::Duckling>, Without<life_cycles::Adult>),
+    >,
+    adult_query: Query<&Transform, (With<life_cycles::Adult>, Without<life_cycles::Duckling>)>,
+) {
+    for (duckling_transform, mut duckling_velocity) in duckling_query.iter_mut() {
+        let mut closest_adult: Option<(Vec2, f32)> = None;
+        for adult_transform in adult_query.iter() {
+            let distance_2 = (duckling_transform.translation.xy()
+                - adult_transform.translation.xy())
+            .length_squared();
+            if distance_2 < boid::VISIBILITY_RADIUS_2
+                && (closest_adult.is_none() || distance_2 < closest_adult.unwrap().1)
+            {
+                closest_adult = Some((adult_transform.translation.xy(), distance_2));
+            }
+        }
+
+        if closest_adult.is_some() {
+            let direction =
+                (closest_adult.unwrap().0 - duckling_transform.translation.xy()).normalize();
+            duckling_velocity.0 += direction * TOWARDS_ADULT_FACTOR * time.delta_seconds();
+        }
+    }
+}
