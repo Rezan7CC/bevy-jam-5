@@ -12,6 +12,7 @@ mod life_cycles;
 mod movement;
 mod spawning;
 mod sprite_animation;
+mod threat_boid;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
@@ -39,7 +40,14 @@ fn main() {
             food::FOOD_PLACEMENT_COOLDOWN,
             TimerMode::Once,
         )))
-        .add_systems(Startup, (setup, spawning::system_spawn_boids))
+        .add_systems(
+            Startup,
+            (
+                setup,
+                spawning::system_spawn_boids,
+                spawning::system_spawn_threats,
+            ),
+        )
         .add_systems(
             Update,
             (
@@ -62,6 +70,8 @@ fn main() {
                     .after(duck_boid::system_boid_update_close_adults)
                     .before(movement::system_clamp_velocity),
                 duck_boid::system_boids_ducklings_towards_adults
+                    .before(movement::system_clamp_velocity),
+                threat_boid::system_boid_towards_closest_duck
                     .before(movement::system_clamp_velocity),
                 movement::system_clamp_velocity,
                 movement::system_flip_based_on_velocity,

@@ -1,8 +1,19 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-pub const MIN_VELOCITY: f32 = 50.0;
-pub const MAX_VELOCITY: f32 = 150.0;
+#[derive(Component)]
+pub struct VelocityLimits {
+    pub min: f32,
+    pub max: f32,
+}
+impl Default for VelocityLimits {
+    fn default() -> Self {
+        Self {
+            min: 50.0,
+            max: 150.0,
+        }
+    }
+}
 
 #[derive(Component, Default)]
 pub struct Velocity(pub Vec2);
@@ -13,9 +24,11 @@ pub fn system_movement(time: Res<Time>, mut query: Query<(&Velocity, &mut Transf
     }
 }
 
-pub fn system_clamp_velocity(mut query: Query<&mut Velocity>) {
-    for mut velocity in query.iter_mut() {
-        velocity.0 = velocity.0.clamp_length(MIN_VELOCITY, MAX_VELOCITY);
+pub fn system_clamp_velocity(mut query: Query<(&mut Velocity, &VelocityLimits)>) {
+    for (mut velocity, velocity_limits) in query.iter_mut() {
+        velocity.0 = velocity
+            .0
+            .clamp_length(velocity_limits.min, velocity_limits.max);
     }
 }
 

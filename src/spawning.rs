@@ -1,5 +1,5 @@
 use crate::food::Food;
-use crate::{life_cycles, sprite_animation};
+use crate::{life_cycles, movement, sprite_animation, threat_boid};
 use bevy::prelude::*;
 
 pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -9,6 +9,16 @@ pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>
             rand::random::<f32>() * 600.0 - 300.0,
         );
         spawn_boid(position, &mut commands, &asset_server);
+    }
+}
+
+pub fn system_spawn_threats(mut commands: Commands, asset_server: Res<AssetServer>) {
+    for _ in 0..10 {
+        let position = Vec2::new(
+            rand::random::<f32>() * 800.0 - 400.0,
+            rand::random::<f32>() * 600.0 - 300.0,
+        );
+        spawn_threat(position, &mut commands, &asset_server);
     }
 }
 
@@ -29,6 +39,25 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<As
                 * (life_cycles::EGG_HATCH_TIME_MAX - life_cycles::EGG_HATCH_TIME_MIN)
                 + life_cycles::EGG_HATCH_TIME_MIN,
         ));
+}
+
+pub fn spawn_threat(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>) {
+    commands
+        .spawn(SpriteBundle {
+            texture: asset_server.load("threat.png"),
+            transform: Transform {
+                translation: position.extend(5.0),
+                scale: Vec3::splat(0.25),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(threat_boid::Threat)
+        .insert(movement::Velocity::default())
+        .insert(movement::VelocityLimits {
+            min: 0.0,
+            max: 100.0,
+        });
 }
 
 const FOOD_SPRITES: [&str; 5] = [

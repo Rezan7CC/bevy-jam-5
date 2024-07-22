@@ -58,10 +58,10 @@ pub fn system_build_relationships(
             .insert(BreedingProgress::default())
             .id();
 
-        commands.entity(entity).insert(Sambo {
+        commands.entity(entity).try_insert(Sambo {
             relationship_entity,
         });
-        commands.entity(other_entity).insert(Sambo {
+        commands.entity(other_entity).try_insert(Sambo {
             relationship_entity,
         });
     }

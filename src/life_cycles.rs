@@ -77,13 +77,18 @@ pub fn system_hatch_eggs(
 
         if transitioned {
             commands.entity(entity).remove::<Egg>();
-            commands.entity(entity).insert(Duckling);
-            commands.entity(entity).insert(Boid);
+            commands.entity(entity).try_insert(Duckling);
+            commands.entity(entity).try_insert(Boid);
 
             let random_direction =
                 Vec2::new(rand::random::<f32>() - 0.5, rand::random::<f32>() - 0.5).normalize();
-            let velocity = random_direction * movement::MIN_VELOCITY;
-            commands.entity(entity).insert(movement::Velocity(velocity));
+
+            let velocity_limits = movement::VelocityLimits::default();
+            let velocity = random_direction * velocity_limits.min;
+            commands
+                .entity(entity)
+                .try_insert(movement::Velocity(velocity))
+                .try_insert(velocity_limits);
         }
     }
 }
@@ -115,7 +120,7 @@ pub fn system_duckling_to_juvenile(
 
         if transitioned {
             commands.entity(entity).remove::<Duckling>();
-            commands.entity(entity).insert(Juvenile);
+            commands.entity(entity).try_insert(Juvenile);
         }
     }
 }
@@ -147,10 +152,10 @@ pub fn system_juvenile_to_adult(
 
         if transitioned {
             commands.entity(entity).remove::<Juvenile>();
-            commands.entity(entity).insert(Adult);
+            commands.entity(entity).try_insert(Adult);
             commands
                 .entity(entity)
-                .insert(duck_boid::CloseAdults::default());
+                .try_insert(duck_boid::CloseAdults::default());
         }
     }
 }
