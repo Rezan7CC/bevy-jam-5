@@ -163,7 +163,9 @@ pub fn system_boids_food(
         if closest_food.is_some() {
             let closet_food_distance_2 = closest_food.unwrap().1;
             if closet_food_distance_2 <= FOOD_EATING_RADIUS_2 {
-                commands.entity(closest_food.unwrap().2).despawn();
+                if let Some(mut entity_cmd) = commands.get_entity(closest_food.unwrap().2) {
+                    entity_cmd.despawn();
+                }
                 continue;
             }
 

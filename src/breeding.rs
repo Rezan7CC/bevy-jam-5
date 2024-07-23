@@ -86,7 +86,9 @@ pub fn system_update_relationships(
         let partner1_valid = sambo_query.get(relationship.partner1).is_ok();
         let partner2_valid = sambo_query.get(relationship.partner2).is_ok();
         if !partner1_valid || !partner2_valid {
-            commands.entity(entity).despawn();
+            if let Some(mut entity_cmd) = commands.get_entity(entity) {
+                entity_cmd.despawn();
+            }
             if partner1_valid {
                 commands.entity(relationship.partner1).remove::<Sambo>();
             }
@@ -103,7 +105,9 @@ pub fn system_update_relationships(
             .length_squared()
             > DISBAND_RELATIONSHIP_DISTANCE_2
         {
-            commands.entity(entity).despawn();
+            if let Some(mut entity_cmd) = commands.get_entity(entity) {
+                entity_cmd.despawn();
+            }
             if partner1_valid {
                 commands.entity(relationship.partner1).remove::<Sambo>();
             }

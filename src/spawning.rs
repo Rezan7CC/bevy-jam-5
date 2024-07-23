@@ -35,11 +35,13 @@ pub fn load_assets(
     loaded_assets.duckling_atlas = texture_atlas_layouts.add(duckling_layout);
 
     loaded_assets.juvenile_sprite = asset_server.load("ducks/juvenile_spritesheet.png");
-    let juvenile_layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 1, None, Some(UVec2::new(0, 33)));
+    let juvenile_layout =
+        TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 1, None, Some(UVec2::new(0, 33)));
     loaded_assets.juvenile_atlas = texture_atlas_layouts.add(juvenile_layout);
 
     loaded_assets.adult_sprite = asset_server.load("ducks/adult_spritesheet.png");
-    let adult_layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 1, None, Some(UVec2::new(0, 33)));
+    let adult_layout =
+        TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 1, None, Some(UVec2::new(0, 33)));
     loaded_assets.adult_atlas = texture_atlas_layouts.add(adult_layout);
 
     loaded_assets.threat_sprite = asset_server.load("threat.png");

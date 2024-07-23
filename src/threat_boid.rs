@@ -35,7 +35,9 @@ pub fn system_boid_towards_closest_duck(
 
         if closest_duck.is_some() && threat.eating_cooldown <= 0.0 {
             if closest_duck.unwrap().1 <= THREAT_EATING_RADIUS_2 {
-                commands.entity(closest_duck.unwrap().2).despawn();
+                if let Some(mut entity_cmd) = commands.get_entity(closest_duck.unwrap().2) {
+                    entity_cmd.despawn();
+                }
                 threat.eating_cooldown = THREAT_EATING_COOLDOWN_DURATION;
                 continue;
             }
