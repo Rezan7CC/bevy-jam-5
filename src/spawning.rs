@@ -5,9 +5,16 @@ use bevy::prelude::*;
 #[derive(Resource, Default)]
 pub struct LoadedAssets {
     egg_sprite: Handle<Image>,
+
     pub duckling_sprite: Handle<Image>,
+    pub duckling_atlas: Handle<TextureAtlasLayout>,
+
     pub juvenile_sprite: Handle<Image>,
+    pub juvenile_atlas: Handle<TextureAtlasLayout>,
+
     pub adult_sprite: Handle<Image>,
+    pub adult_atlas: Handle<TextureAtlasLayout>,
+
     threat_sprite: Handle<Image>,
 
     heart_sprite_sheet: Handle<Image>,
@@ -22,9 +29,19 @@ pub fn load_assets(
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     loaded_assets.egg_sprite = asset_server.load("egg.png");
-    loaded_assets.duckling_sprite = asset_server.load("duckling.png");
-    loaded_assets.juvenile_sprite = asset_server.load("juvenile.png");
-    loaded_assets.adult_sprite = asset_server.load("adult.png");
+
+    loaded_assets.duckling_sprite = asset_server.load("ducks/ducky-walk.png");
+    let duckling_layout = TextureAtlasLayout::from_grid(UVec2::splat(48), 4, 1, None, None);
+    loaded_assets.duckling_atlas = texture_atlas_layouts.add(duckling_layout);
+
+    loaded_assets.juvenile_sprite = asset_server.load("ducks/ducky-walk.png");
+    let juvenile_layout = TextureAtlasLayout::from_grid(UVec2::splat(48), 4, 1, None, None);
+    loaded_assets.juvenile_atlas = texture_atlas_layouts.add(juvenile_layout);
+
+    loaded_assets.adult_sprite = asset_server.load("ducks/ducky-walk.png");
+    let adult_layout = TextureAtlasLayout::from_grid(UVec2::splat(48), 4, 1, None, None);
+    loaded_assets.adult_atlas = texture_atlas_layouts.add(adult_layout);
+
     loaded_assets.threat_sprite = asset_server.load("threat.png");
 
     loaded_assets.heart_sprite_sheet = asset_server.load("heart_sprite_sheet.png");
@@ -73,7 +90,13 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, loaded_assets: &Res<L
             rand::random::<f32>()
                 * (life_cycles::EGG_HATCH_TIME_MAX - life_cycles::EGG_HATCH_TIME_MIN)
                 + life_cycles::EGG_HATCH_TIME_MIN,
-        ));
+        ))
+        .insert(sprite_animation::AnimationIndices { first: 0, last: 0 })
+        .insert(sprite_animation::AnimationTimer(Timer::from_seconds(
+            0.25,
+            TimerMode::Once,
+        )))
+        .insert(TextureAtlas::default());
 }
 
 pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>) {
