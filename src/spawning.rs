@@ -80,7 +80,7 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, loaded_assets: &Res<L
             texture: loaded_assets.egg_sprite.clone(),
             transform: Transform {
                 translation: position.extend(-1.0),
-                scale: Vec3::splat(0.25),
+                scale: Vec3::splat(0.5),
                 ..Default::default()
             },
             ..Default::default()
