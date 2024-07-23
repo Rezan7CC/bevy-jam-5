@@ -52,7 +52,7 @@ pub fn spawn_threat(position: Vec2, commands: &mut Commands, asset_server: &Res<
             },
             ..Default::default()
         })
-        .insert(threat_boid::Threat)
+        .insert(threat_boid::Threat::default())
         .insert(movement::Velocity::default())
         .insert(movement::VelocityLimits {
             min: 0.0,

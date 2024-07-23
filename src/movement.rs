@@ -34,6 +34,14 @@ pub fn system_clamp_velocity(mut query: Query<(&mut Velocity, &VelocityLimits)>)
 
 const EDGE_MARGIN: f32 = 100.0;
 const TURN_FACTOR: f32 = 130.0;
+
+pub fn is_avoiding_edge(position: Vec2, window: &Window) -> bool {
+    position.x < -window.width() * 0.5 + EDGE_MARGIN
+        || position.x > window.width() * 0.5 - EDGE_MARGIN
+        || position.y < -window.height() * 0.5 + EDGE_MARGIN
+        || position.y > window.height() * 0.5 - EDGE_MARGIN
+}
+
 pub fn system_avoid_edges(
     time: Res<Time>,
     mut query: Query<(&mut Velocity, &Transform)>,
