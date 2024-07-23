@@ -3,7 +3,7 @@ use crate::{life_cycles, movement, sprite_animation, threat_boid};
 use bevy::prelude::*;
 
 pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>) {
-    for _ in 0..100 {
+    for _ in 0..10 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,
@@ -13,7 +13,7 @@ pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>
 }
 
 pub fn system_spawn_threats(mut commands: Commands, asset_server: Res<AssetServer>) {
-    for _ in 0..10 {
+    for _ in 0..2 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,

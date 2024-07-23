@@ -5,7 +5,7 @@ use bevy::utils::HashMap;
 #[derive(Component)]
 pub struct Boid;
 
-const PROTECTED_RADIUS_2: f32 = 50.0 * 50.0;
+const PROTECTED_RADIUS_2: f32 = 70.0 * 70.0;
 const AVOID_FACTOR: f32 = 0.35;
 pub fn system_boid_separation(
     time: Res<Time>,
@@ -35,7 +35,7 @@ pub fn system_boid_separation(
 
 pub const VISIBILITY_RADIUS_2: f32 = 100.0 * 100.0;
 const ALIGN_FACTOR: f32 = 0.5;
-const COHESION_FACTOR: f32 = 0.25;
+const COHESION_FACTOR: f32 = 0.15;
 pub fn system_boid_alignment_and_cohesion(
     time: Res<Time>,
     mut queries: ParamSet<(

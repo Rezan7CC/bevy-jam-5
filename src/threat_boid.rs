@@ -4,10 +4,10 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Threat;
 
-const THREAT_VISIBILITY_RADIUS_2: f32 = 70.0 * 70.0;
+const THREAT_VISIBILITY_RADIUS_2: f32 = 100.0 * 100.0;
 const TOWARDS_CLOSEST_DUCK_FACTOR: f32 = 100.0;
 const DECELERATION_FACTOR: f32 = 20.0;
-const THREAT_EATING_RADIUS_2: f32 = 10.0 * 10.0;
+const THREAT_EATING_RADIUS_2: f32 = 20.0 * 20.0;
 pub fn system_boid_towards_closest_duck(
     time: Res<Time>,
     mut commands: Commands,
