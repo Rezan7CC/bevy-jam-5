@@ -566,14 +566,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_github_ci_template"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "rand",
-]
-
-[[package]]
 name = "bevy_gizmos"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1591,6 +1583,14 @@ name = "dpi"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f25c0e292a7ca6d6498557ff1df68f32c99850012b6ea401cf8daf771f22ff53"
+
+[[package]]
+name = "ducky_boids"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "rand",
+]
 
 [[package]]
 name = "either"
