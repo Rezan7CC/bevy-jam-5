@@ -40,12 +40,14 @@ fn main() {
             food::FOOD_PLACEMENT_COOLDOWN,
             TimerMode::Once,
         )))
+        .insert_resource(spawning::LoadedAssets::default())
         .add_systems(
             Startup,
             (
                 setup,
-                spawning::system_spawn_boids,
-                spawning::system_spawn_threats,
+                spawning::load_assets,
+                spawning::system_spawn_boids.after(spawning::load_assets),
+                spawning::system_spawn_threats.after(spawning::load_assets),
             ),
         )
         .add_systems(

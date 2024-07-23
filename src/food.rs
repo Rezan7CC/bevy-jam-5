@@ -1,4 +1,5 @@
 use crate::spawning;
+use crate::spawning::LoadedAssets;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
@@ -16,7 +17,7 @@ pub fn system_place_food_on_input(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    loaded_assets: Res<LoadedAssets>,
     mut food_placement_timer: ResMut<FoodPlacementTimer>,
 ) {
     let window = if let Ok(window) = window_query.get_single() {
@@ -56,5 +57,5 @@ pub fn system_place_food_on_input(
         return;
     };
 
-    spawning::spawn_food(world_position, &mut commands, &asset_server);
+    spawning::spawn_food(world_position, &mut commands, &loaded_assets);
 }

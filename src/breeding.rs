@@ -78,8 +78,7 @@ pub fn system_update_relationships(
         (Without<Adult>, Without<Sambo>),
     >,
     sambo_query: Query<(&Transform, &CloseAdults), (With<Adult>, With<Sambo>)>,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    loaded_assets: Res<spawning::LoadedAssets>,
 ) {
     for (entity, mut relationship, transform) in relationship_query.iter_mut() {
         relationship.duration += time.delta_seconds();
@@ -123,8 +122,7 @@ pub fn system_update_relationships(
                 entity,
                 relationship_position,
                 &mut commands,
-                &asset_server,
-                &mut texture_atlas_layouts,
+                &loaded_assets,
             );
         } else if transform.is_some() {
             transform.unwrap().translation = relationship_position.extend(5.0);
@@ -139,7 +137,7 @@ pub const BREEDING_DURATION: f32 = 5.0 * crate::life_cycles::TIME_FACTOR;
 
 pub fn system_breeding(
     time: Res<Time>,
-    asset_server: Res<AssetServer>,
+    loaded_assets: Res<spawning::LoadedAssets>,
     mut commands: Commands,
     mut relationship_query: Query<(&Transform, &mut BreedingProgress), With<Relationship>>,
 ) {
@@ -147,7 +145,7 @@ pub fn system_breeding(
         breeding_progress.0 += time.delta_seconds();
 
         if breeding_progress.0 >= BREEDING_DURATION {
-            spawning::spawn_boid(transform.translation.xy(), &mut commands, &asset_server);
+            spawning::spawn_boid(transform.translation.xy(), &mut commands, &loaded_assets);
 
             breeding_progress.0 = 0.0;
         }

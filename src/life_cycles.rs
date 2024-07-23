@@ -33,9 +33,8 @@ pub fn system_decrease_lifecycle_time(time: Res<Time>, mut query: Query<&mut Lif
 fn transition_life_cycle(
     next_cycle_time_min: f32,
     next_cycle_time_max: f32,
-    next_cycle_sprite_name: &'static str,
     z_value: f32,
-    asset_server: &Res<AssetServer>,
+    new_image: Handle<Image>,
     entity_image: &mut Handle<Image>,
     life_cycle_time: &mut LifeCycleTime,
     transform: &mut Transform,
@@ -43,7 +42,7 @@ fn transition_life_cycle(
     if life_cycle_time.0 > 0.0 {
         return false;
     }
-    spawning::switch_sprite(next_cycle_sprite_name, asset_server, entity_image);
+    *entity_image = new_image;
     transform.translation.z = z_value;
     life_cycle_time.0 =
         rand::random::<f32>() * (next_cycle_time_max - next_cycle_time_min) + next_cycle_time_min;
@@ -52,7 +51,7 @@ fn transition_life_cycle(
 
 pub fn system_hatch_eggs(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    loaded_assets: Res<spawning::LoadedAssets>,
     mut query: Query<
         (
             Entity,
@@ -67,9 +66,8 @@ pub fn system_hatch_eggs(
         let transitioned = transition_life_cycle(
             DUCKLING_TO_JUVENILE_TIME_MIN,
             DUCKLING_TO_JUVENILE_TIME_MAX,
-            "duckling.png",
             0.0,
-            &asset_server,
+            loaded_assets.duckling_sprite.clone(),
             &mut entity_image,
             &mut life_cycle_time,
             &mut transform,
@@ -95,7 +93,7 @@ pub fn system_hatch_eggs(
 
 pub fn system_duckling_to_juvenile(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    loaded_assets: Res<spawning::LoadedAssets>,
     mut query: Query<
         (
             Entity,
@@ -110,9 +108,8 @@ pub fn system_duckling_to_juvenile(
         let transitioned = transition_life_cycle(
             JUVENILE_TO_ADULT_TIME_MIN,
             JUVENILE_TO_ADULT_TIME_MAX,
-            "juvenile.png",
             1.0,
-            &asset_server,
+            loaded_assets.juvenile_sprite.clone(),
             &mut entity_image,
             &mut life_cycle_time,
             &mut transform,
@@ -127,7 +124,7 @@ pub fn system_duckling_to_juvenile(
 
 pub fn system_juvenile_to_adult(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    loaded_assets: Res<spawning::LoadedAssets>,
     mut query: Query<
         (
             Entity,
@@ -142,9 +139,8 @@ pub fn system_juvenile_to_adult(
         let transitioned = transition_life_cycle(
             DUCKLING_TO_JUVENILE_TIME_MIN,
             DUCKLING_TO_JUVENILE_TIME_MAX,
-            "adult.png",
             2.0,
-            &asset_server,
+            loaded_assets.adult_sprite.clone(),
             &mut entity_image,
             &mut life_cycle_time,
             &mut transform,

@@ -2,30 +2,65 @@ use crate::food::Food;
 use crate::{life_cycles, movement, sprite_animation, threat_boid};
 use bevy::prelude::*;
 
-pub fn system_spawn_boids(mut commands: Commands, asset_server: Res<AssetServer>) {
+#[derive(Resource, Default)]
+pub struct LoadedAssets {
+    egg_sprite: Handle<Image>,
+    pub duckling_sprite: Handle<Image>,
+    pub juvenile_sprite: Handle<Image>,
+    pub adult_sprite: Handle<Image>,
+    threat_sprite: Handle<Image>,
+
+    heart_sprite_sheet: Handle<Image>,
+    heart_atlas_layout: Handle<TextureAtlasLayout>,
+
+    food_sprites: Vec<Handle<Image>>,
+}
+
+pub fn load_assets(
+    asset_server: Res<AssetServer>,
+    mut loaded_assets: ResMut<LoadedAssets>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+) {
+    loaded_assets.egg_sprite = asset_server.load("egg.png");
+    loaded_assets.duckling_sprite = asset_server.load("duckling.png");
+    loaded_assets.juvenile_sprite = asset_server.load("juvenile.png");
+    loaded_assets.adult_sprite = asset_server.load("adult.png");
+    loaded_assets.threat_sprite = asset_server.load("threat.png");
+
+    loaded_assets.heart_sprite_sheet = asset_server.load("heart_sprite_sheet.png");
+    let heart_layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 4, 1, None, None);
+    loaded_assets.heart_atlas_layout = texture_atlas_layouts.add(heart_layout);
+
+    loaded_assets.food_sprites = FOOD_SPRITES
+        .iter()
+        .map(|path| asset_server.load(*path))
+        .collect();
+}
+
+pub fn system_spawn_boids(mut commands: Commands, loaded_assets: Res<LoadedAssets>) {
     for _ in 0..10 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,
         );
-        spawn_boid(position, &mut commands, &asset_server);
+        spawn_boid(position, &mut commands, &loaded_assets);
     }
 }
 
-pub fn system_spawn_threats(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn system_spawn_threats(mut commands: Commands, loaded_assets: Res<LoadedAssets>) {
     for _ in 0..2 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,
         );
-        spawn_threat(position, &mut commands, &asset_server);
+        spawn_threat(position, &mut commands, &loaded_assets);
     }
 }
 
-pub fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>) {
+pub fn spawn_boid(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>) {
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("egg.png"),
+            texture: loaded_assets.egg_sprite.clone(),
             transform: Transform {
                 translation: position.extend(-1.0),
                 scale: Vec3::splat(0.25),
@@ -41,10 +76,10 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, asset_server: &Res<As
         ));
 }
 
-pub fn spawn_threat(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>) {
+pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>) {
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("threat.png"),
+            texture: loaded_assets.threat_sprite.clone(),
             transform: Transform {
                 translation: position.extend(5.0),
                 scale: Vec3::splat(0.25),
@@ -60,20 +95,19 @@ pub fn spawn_threat(position: Vec2, commands: &mut Commands, asset_server: &Res<
         });
 }
 
-const FOOD_SPRITES: [&str; 5] = [
+const FOOD_SPRITES: [&str; 4] = [
     "foods/bread.png",
     "foods/pretzel.png",
     "foods/cake.png",
     "foods/croissant.png",
-    "foods/donut.png",
 ];
 
-pub fn spawn_food(position: Vec2, commands: &mut Commands, asset_server: &Res<AssetServer>) {
-    let sprite_path = FOOD_SPRITES[rand::random::<usize>() % FOOD_SPRITES.len()];
+pub fn spawn_food(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>) {
+    let random_index = rand::random::<usize>() % FOOD_SPRITES.len();
 
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load(sprite_path),
+            texture: loaded_assets.food_sprites[random_index].clone(),
             transform: Transform {
                 translation: position.extend(-2.0),
                 scale: Vec3::splat(1.0),
@@ -84,26 +118,12 @@ pub fn spawn_food(position: Vec2, commands: &mut Commands, asset_server: &Res<As
         .insert(Food);
 }
 
-pub fn switch_sprite(
-    sprite_path: &'static str,
-    asset_server: &Res<AssetServer>,
-    entity_image: &mut Handle<Image>,
-) {
-    let new_image_handle = asset_server.load(sprite_path);
-    *entity_image = new_image_handle;
-}
-
 pub fn spawn_relationship_sprite(
     entity: Entity,
     position: Vec2,
     commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
+    loaded_assets: &Res<LoadedAssets>,
 ) {
-    let texture = asset_server.load("heart_sprite_sheet.png");
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 4, 1, None, None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
-
     let animation_indices = sprite_animation::AnimationIndices { first: 0, last: 3 };
     commands.entity(entity).insert((
         SpriteBundle {
@@ -112,11 +132,11 @@ pub fn spawn_relationship_sprite(
                 scale: Vec3::splat(0.5),
                 ..Default::default()
             },
-            texture,
+            texture: loaded_assets.heart_sprite_sheet.clone(),
             ..default()
         },
         TextureAtlas {
-            layout: texture_atlas_layout,
+            layout: loaded_assets.heart_atlas_layout.clone(),
             index: animation_indices.first,
         },
         animation_indices,
