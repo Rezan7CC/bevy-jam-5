@@ -56,7 +56,7 @@ pub fn spawn_threat(position: Vec2, commands: &mut Commands, asset_server: &Res<
         .insert(movement::Velocity::default())
         .insert(movement::VelocityLimits {
             min: 0.0,
-            max: 100.0,
+            max: 200.0,
         });
 }
 

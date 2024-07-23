@@ -1,6 +1,6 @@
 use crate::boid::Boid;
 use crate::movement::Velocity;
-use crate::{boid, food, life_cycles};
+use crate::{food, life_cycles, threat_boid};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 
@@ -173,6 +173,7 @@ pub fn system_boids_food(
     }
 }
 
+const TOWARDS_ADULT_RADIUS_2: f32 = 200.0 * 200.0;
 const TOWARDS_ADULT_FACTOR: f32 = 50.0;
 pub fn system_boids_ducklings_towards_adults(
     time: Res<Time>,
@@ -188,7 +189,7 @@ pub fn system_boids_ducklings_towards_adults(
             let distance_2 = (duckling_transform.translation.xy()
                 - adult_transform.translation.xy())
             .length_squared();
-            if distance_2 < boid::VISIBILITY_RADIUS_2
+            if distance_2 < TOWARDS_ADULT_RADIUS_2
                 && (closest_adult.is_none() || distance_2 < closest_adult.unwrap().1)
             {
                 closest_adult = Some((adult_transform.translation.xy(), distance_2));
@@ -199,6 +200,33 @@ pub fn system_boids_ducklings_towards_adults(
             let direction =
                 (closest_adult.unwrap().0 - duckling_transform.translation.xy()).normalize();
             duckling_velocity.0 += direction * TOWARDS_ADULT_FACTOR * time.delta_seconds();
+        }
+    }
+}
+
+const AVOID_THREATS_RADIUS_2: f32 = 200.0 * 200.0;
+const AVOID_THREATS_FACTOR: f32 = 100.0;
+pub fn system_boids_avoid_threat(
+    time: Res<Time>,
+    mut duck_query: Query<(&Transform, &mut Velocity), (With<Boid>, Without<threat_boid::Threat>)>,
+    threat_query: Query<&Transform, With<threat_boid::Threat>>,
+) {
+    for (duck_transform, mut duck_velocity) in duck_query.iter_mut() {
+        let mut closest_threat: Option<(Vec2, f32)> = None;
+        for threat_transform in threat_query.iter() {
+            let distance_2 = (duck_transform.translation.xy() - threat_transform.translation.xy())
+                .length_squared();
+            if distance_2 < AVOID_THREATS_RADIUS_2
+                && (closest_threat.is_none() || distance_2 < closest_threat.unwrap().1)
+            {
+                closest_threat = Some((threat_transform.translation.xy(), distance_2));
+            }
+        }
+
+        if closest_threat.is_some() {
+            let direction =
+                (closest_threat.unwrap().0 - duck_transform.translation.xy()).normalize();
+            duck_velocity.0 -= direction * AVOID_THREATS_FACTOR * time.delta_seconds();
         }
     }
 }

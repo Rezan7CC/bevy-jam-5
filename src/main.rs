@@ -51,10 +51,6 @@ fn main() {
         .add_systems(
             Update,
             (
-                life_cycles::system_decrease_lifecycle_time,
-                life_cycles::system_hatch_eggs,
-                life_cycles::system_duckling_to_juvenile,
-                life_cycles::system_juvenile_to_adult,
                 breeding::system_build_relationships,
                 breeding::system_update_relationships
                     .after(breeding::system_build_relationships)
@@ -71,6 +67,7 @@ fn main() {
                     .before(movement::system_clamp_velocity),
                 duck_boid::system_boids_ducklings_towards_adults
                     .before(movement::system_clamp_velocity),
+                duck_boid::system_boids_avoid_threat.before(movement::system_clamp_velocity),
                 threat_boid::system_boid_towards_closest_duck
                     .before(movement::system_clamp_velocity),
                 movement::system_clamp_velocity,
@@ -79,6 +76,15 @@ fn main() {
                 movement::system_movement.after(movement::system_avoid_edges),
                 food::system_place_food_on_input,
                 sprite_animation::system_animate_sprites.after(movement::system_movement),
+            ),
+        )
+        .add_systems(
+            Update,
+            (
+                life_cycles::system_decrease_lifecycle_time,
+                life_cycles::system_hatch_eggs,
+                life_cycles::system_duckling_to_juvenile,
+                life_cycles::system_juvenile_to_adult,
             ),
         )
         .run();
