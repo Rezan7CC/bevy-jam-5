@@ -12,7 +12,7 @@ pub struct Threat {
 const THREAT_VISIBILITY_RADIUS_2: f32 = 120.0 * 150.0;
 const TOWARDS_CLOSEST_DUCK_FACTOR: f32 = 300.0;
 const DECELERATION_FACTOR: f32 = 150.0;
-const THREAT_EATING_RADIUS_2: f32 = 20.0 * 20.0;
+const THREAT_EATING_RADIUS_2: f32 = 30.0 * 30.0;
 const THREAT_EATING_COOLDOWN_DURATION: f32 = 3.0;
 pub fn system_boid_towards_closest_duck(
     time: Res<Time>,
@@ -82,18 +82,20 @@ pub fn system_update_threat_animation(
     {
         let speed = velocity.0.length();
 
-        if speed > 100.0 && !threat.running {
-            threat.running = true;
-            texture_atlas.layout = loaded_assets.threat_running_atlas.clone();
-            texture_atlas.index = 0;
+        if speed > 100.0 {
+            if !threat.running {
+                threat.running = true;
+                texture_atlas.layout = loaded_assets.threat_running_atlas.clone();
+                texture_atlas.index = 0;
 
-            *animation_indices = sprite_animation::AnimationIndices {
-                first: 0,
-                last: 7,
-                paused: false,
-            };
-            *animation_timer =
-                sprite_animation::AnimationTimer(Timer::from_seconds(0.25, TimerMode::Repeating));
+                *animation_indices = sprite_animation::AnimationIndices {
+                    first: 0,
+                    last: 7,
+                    paused: false,
+                };
+                *animation_timer =
+                    sprite_animation::AnimationTimer(Timer::from_seconds(0.15, TimerMode::Repeating));
+            }
         } else if threat.running {
             threat.running = false;
             texture_atlas.layout = loaded_assets.threat_walking_atlas.clone();

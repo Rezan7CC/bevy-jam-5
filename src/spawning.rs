@@ -15,9 +15,10 @@ pub struct LoadedAssets {
     pub adult_sprite: Handle<Image>,
     pub adult_atlas: Handle<TextureAtlasLayout>,
 
+    tabby_sprite: Handle<Image>,
     threat_sprites: Vec<Handle<Image>>,
-    pub(crate) threat_running_atlas: Handle<TextureAtlasLayout>,
-    pub(crate) threat_walking_atlas: Handle<TextureAtlasLayout>,
+    pub threat_running_atlas: Handle<TextureAtlasLayout>,
+    pub threat_walking_atlas: Handle<TextureAtlasLayout>,
 
     heart_sprite_sheet: Handle<Image>,
     heart_atlas_layout: Handle<TextureAtlasLayout>,
@@ -46,6 +47,7 @@ pub fn load_assets(
         TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 1, None, Some(UVec2::new(0, 33)));
     loaded_assets.adult_atlas = texture_atlas_layouts.add(adult_layout);
 
+    loaded_assets.tabby_sprite = asset_server.load("cats/tabby.png");
     loaded_assets.threat_sprites = CAT_VARIATION_ASSETS
         .iter()
         .map(|path| asset_server.load(*path))
@@ -78,12 +80,12 @@ pub fn system_spawn_boids(mut commands: Commands, loaded_assets: Res<LoadedAsset
 }
 
 pub fn system_spawn_threats(mut commands: Commands, loaded_assets: Res<LoadedAssets>) {
-    for _ in 0..2 {
+    for index in 0..2 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,
         );
-        spawn_threat(position, &mut commands, &loaded_assets);
+        spawn_threat(position, &mut commands, &loaded_assets, index == 0);
     }
 }
 
@@ -123,7 +125,7 @@ const CAT_VARIATION_ASSETS: [&str; 4] = [
     "cats/brown_7.png",
 ];
 
-pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>) {
+pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>, tabby: bool) {
     let walking_animation_indices = sprite_animation::AnimationIndices {
         first: 0,
         last: 3,
@@ -132,13 +134,19 @@ pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res
     let random_animation_start_index = rand::random::<usize>() % 4;
     let random_animation_timer: f32 = rand::random::<f32>() * 0.5 + 1.0;
     let random_index = rand::random::<usize>() % CAT_VARIATION_ASSETS.len();
+    
+    let texture = if tabby {
+        loaded_assets.tabby_sprite.clone()
+    } else {
+        loaded_assets.threat_sprites[random_index].clone()
+    };
     commands
         .spawn(SpriteBundle {
             sprite: Sprite {
                 flip_x: true,
                 ..Default::default()
             },
-            texture: loaded_assets.threat_sprites[random_index].clone(),
+            texture,
             transform: Transform {
                 translation: position.extend(5.0),
                 scale: Vec3::splat(3.0),
