@@ -13,9 +13,17 @@ mod movement;
 mod spawning;
 mod sprite_animation;
 mod threat_boid;
+mod ui;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+enum GameState {
+    #[default]
+    Paused,
+    Running,
+}
 
 fn main() {
     App::new()
@@ -43,10 +51,12 @@ fn main() {
         )))
         .insert_resource(spawning::LoadedAssets::default())
         .insert_resource(spawning::CurrentThreats::default())
+        .insert_state(GameState::Paused)
         .add_systems(
             Startup,
             (
                 setup,
+                ui::system_create_main_menu,
                 spawning::load_assets,
                 spawning::system_spawn_boids.after(spawning::load_assets),
                 spawning::system_spawn_threats.after(spawning::load_assets),
@@ -82,7 +92,8 @@ fn main() {
                 movement::system_movement.after(movement::system_avoid_edges),
                 food::system_place_food_on_input,
                 sprite_animation::system_animate_sprites.after(movement::system_movement),
-            ),
+            )
+                .run_if(in_state(GameState::Running)),
         )
         .add_systems(
             Update,
@@ -91,8 +102,10 @@ fn main() {
                 life_cycles::system_hatch_eggs,
                 life_cycles::system_duckling_to_juvenile,
                 life_cycles::system_juvenile_to_adult,
-            ),
+            )
+                .run_if(in_state(GameState::Running)),
         )
+        .add_systems(Update, (ui::system_ui_actions, ui::system_button_color))
         .run();
 }
 
