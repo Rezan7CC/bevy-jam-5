@@ -15,7 +15,9 @@ pub struct LoadedAssets {
     pub adult_sprite: Handle<Image>,
     pub adult_atlas: Handle<TextureAtlasLayout>,
 
-    threat_sprite: Handle<Image>,
+    threat_sprites: Vec<Handle<Image>>,
+    threat_running_atlas: Handle<TextureAtlasLayout>,
+    threat_walking_atlas: Handle<TextureAtlasLayout>,
 
     heart_sprite_sheet: Handle<Image>,
     heart_atlas_layout: Handle<TextureAtlasLayout>,
@@ -44,7 +46,16 @@ pub fn load_assets(
         TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 1, None, Some(UVec2::new(0, 33)));
     loaded_assets.adult_atlas = texture_atlas_layouts.add(adult_layout);
 
-    loaded_assets.threat_sprite = asset_server.load("threat.png");
+    loaded_assets.threat_sprites = CAT_VARIATION_ASSETS
+        .iter()
+        .map(|path| asset_server.load(*path))
+        .collect();
+    let threat_running_layout =
+        TextureAtlasLayout::from_grid(UVec2::splat(32), 4, 2, None, Some(UVec2::new(640, 100)));
+    let threat_walking_layout =
+        TextureAtlasLayout::from_grid(UVec2::splat(32), 4, 1, None, Some(UVec2::new(384, 100)));
+    loaded_assets.threat_running_atlas = texture_atlas_layouts.add(threat_running_layout);
+    loaded_assets.threat_walking_atlas = texture_atlas_layouts.add(threat_walking_layout);
 
     loaded_assets.heart_sprite_sheet = asset_server.load("heart_sprite_sheet.png");
     let heart_layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 4, 1, None, None);
@@ -93,7 +104,11 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, loaded_assets: &Res<L
                 * (life_cycles::EGG_HATCH_TIME_MAX - life_cycles::EGG_HATCH_TIME_MIN)
                 + life_cycles::EGG_HATCH_TIME_MIN,
         ))
-        .insert(sprite_animation::AnimationIndices { first: 0, last: 0 })
+        .insert(sprite_animation::AnimationIndices {
+            first: 0,
+            last: 0,
+            paused: false,
+        })
         .insert(sprite_animation::AnimationTimer(Timer::from_seconds(
             0.25,
             TimerMode::Once,
@@ -101,13 +116,32 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, loaded_assets: &Res<L
         .insert(TextureAtlas::default());
 }
 
+const CAT_VARIATION_ASSETS: [&str; 4] = [
+    "cats/black_4.png",
+    "cats/brown_1.png",
+    "cats/brown_3.png",
+    "cats/brown_7.png",
+];
+
 pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>) {
+    //let running_animation_indices = sprite_animation::AnimationIndices { first: 0, last: 7, paused: false};
+    let walking_animation_indices = sprite_animation::AnimationIndices {
+        first: 0,
+        last: 3,
+        paused: true,
+    };
+
+    let random_index = rand::random::<usize>() % CAT_VARIATION_ASSETS.len();
     commands
         .spawn(SpriteBundle {
-            texture: loaded_assets.threat_sprite.clone(),
+            sprite: Sprite {
+                flip_x: true,
+                ..Default::default()
+            },
+            texture: loaded_assets.threat_sprites[random_index].clone(),
             transform: Transform {
                 translation: position.extend(5.0),
-                scale: Vec3::splat(0.25),
+                scale: Vec3::splat(3.0),
                 ..Default::default()
             },
             ..Default::default()
@@ -117,7 +151,15 @@ pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res
         .insert(movement::VelocityLimits {
             min: 0.0,
             max: 200.0,
-        });
+        })
+        .insert((
+            TextureAtlas {
+                layout: loaded_assets.threat_walking_atlas.clone(),
+                index: walking_animation_indices.first,
+            },
+            walking_animation_indices,
+            sprite_animation::AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+        ));
 }
 
 const FOOD_SPRITES: [&str; 4] = [
@@ -149,7 +191,11 @@ pub fn spawn_relationship_sprite(
     commands: &mut Commands,
     loaded_assets: &Res<LoadedAssets>,
 ) {
-    let animation_indices = sprite_animation::AnimationIndices { first: 0, last: 3 };
+    let animation_indices = sprite_animation::AnimationIndices {
+        first: 0,
+        last: 3,
+        paused: false,
+    };
     commands.entity(entity).insert((
         SpriteBundle {
             transform: Transform {

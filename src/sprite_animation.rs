@@ -4,6 +4,7 @@ use bevy::prelude::*;
 pub struct AnimationIndices {
     pub first: usize,
     pub last: usize,
+    pub paused: bool,
 }
 
 #[derive(Component, Deref, DerefMut)]
@@ -14,6 +15,10 @@ pub fn system_animate_sprites(
     mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
 ) {
     for (indices, mut timer, mut atlas) in &mut query {
+        if indices.paused {
+            continue;
+        }
+
         timer.tick(time.delta());
         if timer.just_finished() {
             atlas.index = if atlas.index == indices.last {
