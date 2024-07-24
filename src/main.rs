@@ -28,6 +28,7 @@ fn main() {
                     meta_check: AssetMetaCheck::Never,
                     ..default()
                 })
+                .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "Duck Boids".to_string(),
