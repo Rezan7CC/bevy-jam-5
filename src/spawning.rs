@@ -1,6 +1,8 @@
+use crate::boid::Boid;
 use crate::food::Food;
 use crate::{life_cycles, movement, sprite_animation, threat_boid};
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 
 #[derive(Resource, Default)]
 pub struct LoadedAssets {
@@ -79,13 +81,55 @@ pub fn system_spawn_boids(mut commands: Commands, loaded_assets: Res<LoadedAsset
     }
 }
 
-pub fn system_spawn_threats(mut commands: Commands, loaded_assets: Res<LoadedAssets>) {
+pub fn system_spawn_threats(
+    mut commands: Commands,
+    loaded_assets: Res<LoadedAssets>,
+    mut current_threats: ResMut<CurrentThreats>,
+) {
     for index in 0..2 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,
         );
-        spawn_threat(position, &mut commands, &loaded_assets, index == 0);
+        spawn_threat(
+            position,
+            &mut commands,
+            &loaded_assets,
+            &mut current_threats,
+            index == 0,
+        );
+    }
+}
+
+#[derive(Resource, Default)]
+pub struct CurrentThreats(i32);
+pub fn system_continuous_threat_spawning(
+    mut commands: Commands,
+    loaded_assets: Res<LoadedAssets>,
+    mut current_threats: ResMut<CurrentThreats>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    duck_query: Query<Entity, (With<Boid>, Without<threat_boid::Threat>)>,
+) {
+    let window = if let Ok(window) = window_query.get_single() {
+        window
+    } else {
+        return;
+    };
+    let window_width = window.width();
+    let buffer = 50.0;
+
+    let duck_count = duck_query.iter().count() as f32;
+    if current_threats.0 < (duck_count * 0.1) as i32 {
+        let random_position_on_circle =
+            Vec2::new(rand::random::<f32>().cos(), rand::random::<f32>().sin())
+                * (window_width * 0.5 + buffer);
+        spawn_threat(
+            random_position_on_circle,
+            &mut commands,
+            &loaded_assets,
+            &mut current_threats,
+            false,
+        );
     }
 }
 
@@ -125,7 +169,14 @@ const CAT_VARIATION_ASSETS: [&str; 4] = [
     "cats/brown_7.png",
 ];
 
-pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>, tabby: bool) {
+pub fn spawn_threat(
+    position: Vec2,
+    commands: &mut Commands,
+    loaded_assets: &Res<LoadedAssets>,
+    current_threats: &mut ResMut<CurrentThreats>,
+    tabby: bool,
+) {
+    current_threats.0 += 1;
     let walking_animation_indices = sprite_animation::AnimationIndices {
         first: 0,
         last: 3,
@@ -134,7 +185,7 @@ pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res
     let random_animation_start_index = rand::random::<usize>() % 4;
     let random_animation_timer: f32 = rand::random::<f32>() * 0.5 + 1.0;
     let random_index = rand::random::<usize>() % CAT_VARIATION_ASSETS.len();
-    
+
     let texture = if tabby {
         loaded_assets.tabby_sprite.clone()
     } else {

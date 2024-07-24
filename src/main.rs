@@ -42,6 +42,7 @@ fn main() {
             TimerMode::Once,
         )))
         .insert_resource(spawning::LoadedAssets::default())
+        .insert_resource(spawning::CurrentThreats::default())
         .add_systems(
             Startup,
             (
@@ -54,6 +55,7 @@ fn main() {
         .add_systems(
             Update,
             (
+                spawning::system_continuous_threat_spawning,
                 breeding::system_build_relationships,
                 breeding::system_update_relationships
                     .after(breeding::system_build_relationships)

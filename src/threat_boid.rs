@@ -93,8 +93,10 @@ pub fn system_update_threat_animation(
                     last: 7,
                     paused: false,
                 };
-                *animation_timer =
-                    sprite_animation::AnimationTimer(Timer::from_seconds(0.15, TimerMode::Repeating));
+                *animation_timer = sprite_animation::AnimationTimer(Timer::from_seconds(
+                    0.15,
+                    TimerMode::Repeating,
+                ));
             }
         } else if threat.running {
             threat.running = false;
