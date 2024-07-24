@@ -135,7 +135,7 @@ pub fn spawn_food(position: Vec2, commands: &mut Commands, loaded_assets: &Res<L
             texture: loaded_assets.food_sprites[random_index].clone(),
             transform: Transform {
                 translation: position.extend(-2.0),
-                scale: Vec3::splat(1.0),
+                scale: Vec3::splat(1.15),
                 rotation: Quat::from_rotation_z(rand::random::<f32>() * std::f32::consts::PI),
             },
             ..Default::default()
