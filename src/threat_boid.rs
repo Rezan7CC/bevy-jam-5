@@ -1,10 +1,12 @@
-use crate::{boid, movement};
+use crate::spawning::LoadedAssets;
+use crate::{boid, movement, sprite_animation};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 #[derive(Component, Default)]
 pub struct Threat {
     pub eating_cooldown: f32,
+    pub running: bool,
 }
 
 const THREAT_VISIBILITY_RADIUS_2: f32 = 120.0 * 150.0;
@@ -61,6 +63,49 @@ pub fn system_boid_towards_closest_duck(
                 let new_length = (length - DECELERATION_FACTOR * time.delta_seconds()).max(0.0);
                 threat_velocity.0 = threat_velocity.0 / length * new_length;
             }
+        }
+    }
+}
+
+pub fn system_update_threat_animation(
+    mut query: Query<(
+        &mut TextureAtlas,
+        &movement::Velocity,
+        &mut sprite_animation::AnimationIndices,
+        &mut sprite_animation::AnimationTimer,
+        &mut Threat,
+    )>,
+    loaded_assets: Res<LoadedAssets>,
+) {
+    for (mut texture_atlas, velocity, mut animation_indices, mut animation_timer, mut threat) in
+        query.iter_mut()
+    {
+        let speed = velocity.0.length();
+
+        if speed > 100.0 && !threat.running {
+            threat.running = true;
+            texture_atlas.layout = loaded_assets.threat_running_atlas.clone();
+            texture_atlas.index = 0;
+
+            *animation_indices = sprite_animation::AnimationIndices {
+                first: 0,
+                last: 7,
+                paused: false,
+            };
+            *animation_timer =
+                sprite_animation::AnimationTimer(Timer::from_seconds(0.25, TimerMode::Repeating));
+        } else if threat.running {
+            threat.running = false;
+            texture_atlas.layout = loaded_assets.threat_walking_atlas.clone();
+            texture_atlas.index = 0;
+
+            *animation_indices = sprite_animation::AnimationIndices {
+                first: 0,
+                last: 3,
+                paused: false,
+            };
+            *animation_timer =
+                sprite_animation::AnimationTimer(Timer::from_seconds(1.5, TimerMode::Repeating));
         }
     }
 }

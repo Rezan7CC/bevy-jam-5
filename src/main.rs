@@ -73,6 +73,7 @@ fn main() {
                 duck_boid::system_boids_avoid_threat.before(movement::system_clamp_velocity),
                 threat_boid::system_boid_towards_closest_duck
                     .before(movement::system_clamp_velocity),
+                threat_boid::system_update_threat_animation.after(movement::system_clamp_velocity),
                 movement::system_clamp_velocity,
                 movement::system_flip_based_on_velocity,
                 movement::system_avoid_edges.after(movement::system_clamp_velocity),

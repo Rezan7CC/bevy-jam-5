@@ -16,8 +16,8 @@ pub struct LoadedAssets {
     pub adult_atlas: Handle<TextureAtlasLayout>,
 
     threat_sprites: Vec<Handle<Image>>,
-    threat_running_atlas: Handle<TextureAtlasLayout>,
-    threat_walking_atlas: Handle<TextureAtlasLayout>,
+    pub(crate) threat_running_atlas: Handle<TextureAtlasLayout>,
+    pub(crate) threat_walking_atlas: Handle<TextureAtlasLayout>,
 
     heart_sprite_sheet: Handle<Image>,
     heart_atlas_layout: Handle<TextureAtlasLayout>,
@@ -124,13 +124,13 @@ const CAT_VARIATION_ASSETS: [&str; 4] = [
 ];
 
 pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res<LoadedAssets>) {
-    //let running_animation_indices = sprite_animation::AnimationIndices { first: 0, last: 7, paused: false};
     let walking_animation_indices = sprite_animation::AnimationIndices {
         first: 0,
         last: 3,
-        paused: true,
+        paused: false,
     };
-
+    let random_animation_start_index = rand::random::<usize>() % 4;
+    let random_animation_timer: f32 = rand::random::<f32>() * 0.5 + 1.0;
     let random_index = rand::random::<usize>() % CAT_VARIATION_ASSETS.len();
     commands
         .spawn(SpriteBundle {
@@ -155,10 +155,13 @@ pub fn spawn_threat(position: Vec2, commands: &mut Commands, loaded_assets: &Res
         .insert((
             TextureAtlas {
                 layout: loaded_assets.threat_walking_atlas.clone(),
-                index: walking_animation_indices.first,
+                index: random_animation_start_index,
             },
             walking_animation_indices,
-            sprite_animation::AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+            sprite_animation::AnimationTimer(Timer::from_seconds(
+                random_animation_timer,
+                TimerMode::Repeating,
+            )),
         ));
 }
 
