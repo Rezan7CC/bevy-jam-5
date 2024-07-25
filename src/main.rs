@@ -6,6 +6,7 @@
 
 mod boid;
 mod breeding;
+mod cursor;
 mod duck_boid;
 mod food;
 mod life_cycles;
@@ -102,10 +103,20 @@ fn main() {
                 life_cycles::system_hatch_eggs,
                 life_cycles::system_duckling_to_juvenile,
                 life_cycles::system_juvenile_to_adult,
+                cursor::system_update_game_cursor_position,
+                cursor::system_update_game_cursor_image,
             )
                 .run_if(in_state(GameState::Running)),
         )
         .add_systems(Update, (ui::system_ui_actions, ui::system_button_color))
+        .add_systems(
+            OnEnter(GameState::Running),
+            (cursor::system_enable_game_cursor,),
+        )
+        .add_systems(
+            OnEnter(GameState::Paused),
+            (cursor::system_disable_game_cursor,),
+        )
         .run();
 }
 

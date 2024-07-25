@@ -6,6 +6,9 @@ use bevy::window::PrimaryWindow;
 
 #[derive(Resource, Default)]
 pub struct LoadedAssets {
+    pub cursor_empty_sprite: Handle<Image>,
+    pub cursor_food_sprite: Handle<Image>,
+
     egg_sprite: Handle<Image>,
 
     pub duckling_sprite: Handle<Image>,
@@ -33,6 +36,9 @@ pub fn load_assets(
     mut loaded_assets: ResMut<LoadedAssets>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
+    loaded_assets.cursor_empty_sprite = asset_server.load("cursor/frame_0_delay-0.1s.png");
+    loaded_assets.cursor_food_sprite = asset_server.load("cursor/frame_3_delay-0.1s.png");
+
     loaded_assets.egg_sprite = asset_server.load("egg.png");
 
     loaded_assets.duckling_sprite = asset_server.load("ducks/duckling_spritesheet.png");

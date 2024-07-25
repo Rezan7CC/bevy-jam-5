@@ -3,7 +3,7 @@ use crate::spawning::LoadedAssets;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-pub const FOOD_PLACEMENT_COOLDOWN: f32 = 1.0;
+pub const FOOD_PLACEMENT_COOLDOWN: f32 = 2.0;
 
 #[derive(Component)]
 pub struct Food;
