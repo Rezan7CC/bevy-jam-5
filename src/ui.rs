@@ -6,7 +6,7 @@ const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::srgb(0.25, 0.5, 0.25);
 
 const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.5);
+const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.65);
 
 // All actions that can be triggered from a button click
 #[derive(Component)]
@@ -111,7 +111,7 @@ pub fn system_create_main_menu(mut commands: Commands, asset_server: Res<AssetSe
                         TextBundle::from_section(
                             "Ducky Boids",
                             TextStyle {
-                                font_size: 80.0,
+                                font_size: 100.0,
                                 color: TEXT_COLOR,
                                 ..default()
                             },
