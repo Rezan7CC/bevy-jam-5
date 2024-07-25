@@ -140,6 +140,7 @@ fn add_leaderboard_entry(
     let start_index = start_index.max(0) as usize;
     let last_index = last_index.min((leaderboard.len() as i32 - 1).max(0)) as usize;
     let mut added_player = false;
+    let player_name = player_name.to_owned();
 
     for i in start_index..last_index + 1 {
         if i == player_index {
@@ -150,13 +151,7 @@ fn add_leaderboard_entry(
                         LeaderboardMarker::Number => (i + 1).to_string() + ".",
                         LeaderboardMarker::Score => format!("{} ", player_score as i32),
                         LeaderboardMarker::Player => {
-                            player_name
-                                .to_owned()
-                                .split(' ')
-                                .next()
-                                .unwrap()
-                                .to_string()
-                                + " (You)"
+                            player_name.split(' ').next().unwrap().to_string() + " (You)"
                         }
                     },
                     TextStyle {
@@ -213,13 +208,7 @@ fn add_leaderboard_entry(
                 LeaderboardMarker::Number => (player_index + 1).to_string() + ".",
                 LeaderboardMarker::Score => format!("{} ", player_score as i32),
                 LeaderboardMarker::Player => {
-                    player_name
-                        .to_owned()
-                        .split(' ')
-                        .next()
-                        .unwrap()
-                        .to_string()
-                        + " (You)"
+                    player_name.split(' ').next().unwrap().to_string() + " (You)"
                 }
             },
             TextStyle {
