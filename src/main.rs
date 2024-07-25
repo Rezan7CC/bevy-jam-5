@@ -9,8 +9,10 @@ mod breeding;
 mod cursor;
 mod duck_boid;
 mod food;
+mod leaderboard;
 mod life_cycles;
 mod movement;
+mod player;
 mod spawning;
 mod sprite_animation;
 mod threat_boid;
@@ -18,6 +20,7 @@ mod ui;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
+use bevy_jornet::JornetPlugin;
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 enum GameState {
@@ -46,22 +49,34 @@ fn main() {
                     ..Default::default()
                 }),
         )
+        .add_plugins(JornetPlugin::with_leaderboard(
+            env!("JORNET_LEADERBOARD_ID"),
+            env!("JORNET_LEADERBOARD_KEY"),
+        ))
         .insert_resource(food::FoodPlacementTimer(Timer::from_seconds(
             food::FOOD_PLACEMENT_COOLDOWN,
             TimerMode::Once,
         )))
         .insert_resource(spawning::LoadedAssets::default())
         .insert_resource(spawning::CurrentThreats::default())
+        .insert_resource(leaderboard::ProcessedLeaderboard::default())
+        .insert_resource(player::PlayerStats::default())
         .insert_state(GameState::Paused)
         .add_systems(
             Startup,
             (
                 setup,
+                leaderboard::system_setup_leaderboard,
                 ui::system_create_main_menu,
+                ui::system_spawn_leaderboard_ui,
                 spawning::load_assets,
                 spawning::system_spawn_boids.after(spawning::load_assets),
                 spawning::system_spawn_threats.after(spawning::load_assets),
             ),
+        )
+        .add_systems(
+            OnEnter(GameState::Running),
+            leaderboard::system_add_test_score,
         )
         .add_systems(
             Update,
@@ -108,7 +123,14 @@ fn main() {
             )
                 .run_if(in_state(GameState::Running)),
         )
-        .add_systems(Update, (ui::system_ui_actions, ui::system_button_color))
+        .add_systems(
+            Update,
+            (
+                ui::system_ui_actions,
+                ui::system_button_color,
+                leaderboard::system_display_leaderboard,
+            ),
+        )
         .add_systems(
             OnEnter(GameState::Running),
             (cursor::system_enable_game_cursor,),

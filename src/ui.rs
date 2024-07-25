@@ -1,11 +1,12 @@
+use crate::leaderboard::LeaderboardMarker;
 use crate::GameState;
 use bevy::prelude::*;
 
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
-const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
-const PRESSED_BUTTON: Color = Color::srgb(0.25, 0.5, 0.25);
+pub const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
+pub const PRESSED_BUTTON: Color = Color::srgb(0.25, 0.5, 0.25);
 
-const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+pub const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.65);
 
 // All actions that can be triggered from a button click
@@ -141,6 +142,99 @@ pub fn system_create_main_menu(mut commands: Commands, asset_server: Res<AssetSe
                             parent
                                 .spawn(TextBundle::from_section("Play", button_text_style.clone()));
                         });
+                });
+        });
+}
+
+pub fn system_spawn_leaderboard_ui(mut commands: Commands) {
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                margin: UiRect::new(Val::Px(15.0), Val::Auto, Val::Px(10.0), Val::Auto),
+                justify_content: JustifyContent::Start,
+                align_items: AlignItems::Start,
+                flex_direction: FlexDirection::Column,
+                //border: UiRect::all(Val::Px(30.0)),
+                ..default()
+            },
+            background_color: BACKGROUND_COLOR.into(),
+            ..default()
+        })
+        .with_children(|parent| {
+            parent.spawn(
+                TextBundle::from_section(
+                    "Leaderboard",
+                    TextStyle {
+                        font_size: 20.0,
+                        color: TEXT_COLOR,
+                        ..default()
+                    },
+                )
+                .with_style(Style {
+                    margin: UiRect::px(10.0, 0.0, 5.0, 0.0),
+                    ..default()
+                }),
+            );
+
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        justify_content: JustifyContent::Start,
+                        align_items: AlignItems::Start,
+                        margin: UiRect::px(5.0, 0.0, 0.0, 0.0),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn((
+                        NodeBundle {
+                            style: Style {
+                                min_width: Val::Px(30.0),
+                                max_width: Val::Px(60.0),
+                                flex_direction: FlexDirection::Column,
+                                justify_content: JustifyContent::Start,
+                                align_items: AlignItems::Start,
+                                margin: UiRect::top(Val::Px(10.0)),
+                                ..default()
+                            },
+
+                            ..default()
+                        },
+                        LeaderboardMarker::Number,
+                    ));
+                    parent.spawn((
+                        NodeBundle {
+                            style: Style {
+                                min_width: Val::Px(150.0),
+                                max_width: Val::Px(200.0),
+                                flex_direction: FlexDirection::Column,
+                                justify_content: JustifyContent::Start,
+                                align_items: AlignItems::Start,
+                                margin: UiRect::top(Val::Px(10.0)),
+                                ..default()
+                            },
+
+                            ..default()
+                        },
+                        LeaderboardMarker::Player,
+                    ));
+                    parent.spawn((
+                        NodeBundle {
+                            style: Style {
+                                min_width: Val::Px(30.0),
+                                max_width: Val::Px(150.0),
+                                flex_direction: FlexDirection::Column,
+                                justify_content: JustifyContent::Start,
+                                align_items: AlignItems::Start,
+                                margin: UiRect::top(Val::Px(10.0)),
+                                ..default()
+                            },
+                            ..default()
+                        },
+                        LeaderboardMarker::Score,
+                    ));
                 });
         });
 }

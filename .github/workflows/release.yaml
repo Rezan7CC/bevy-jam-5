@@ -7,13 +7,16 @@ on:
 
 env:
   # update with the name of the main binary
-  binary: bevy_github_ci_template
+  binary: ducky_boids
   add_binaries_to_github_release: true
   itch_target: Rezan7CC/ducky-boids
 
   # Before enabling LFS, please take a look at GitHub's documentation for costs and quota limits:
   # https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-storage-and-bandwidth-usage
   use_git_lfs: true
+
+  JORNET_LEADERBOARD_ID: ${{ secrets.JORNET_LEADERBOARD_ID }}
+  JORNET_LEADERBOARD_KEY: ${{ secrets.JORNET_LEADERBOARD_KEY }}
 
 
 jobs:

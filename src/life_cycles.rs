@@ -1,5 +1,5 @@
 use crate::boid::Boid;
-use crate::{duck_boid, movement, spawning, sprite_animation};
+use crate::{duck_boid, movement, player, spawning, sprite_animation};
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -66,6 +66,7 @@ fn transition_life_cycle(
 pub fn system_hatch_eggs(
     mut commands: Commands,
     loaded_assets: Res<spawning::LoadedAssets>,
+    mut player_stats: ResMut<player::PlayerStats>,
     mut query: Query<
         (
             Entity,
@@ -114,6 +115,8 @@ pub fn system_hatch_eggs(
             commands.entity(entity).remove::<Egg>();
             commands.entity(entity).try_insert(Duckling);
             commands.entity(entity).try_insert(Boid);
+
+            player_stats.score += 1;
 
             let random_direction =
                 Vec2::new(rand::random::<f32>() - 0.5, rand::random::<f32>() - 0.5).normalize();
