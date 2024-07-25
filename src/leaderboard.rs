@@ -58,7 +58,7 @@ pub fn system_display_leaderboard(
     }
 
     let recreate_leaderboard =
-        leaderboard_changed || (score_changed && processed_leaderboard.scores.len() > 0);
+        leaderboard_changed || (score_changed && !processed_leaderboard.scores.is_empty());
 
     if recreate_leaderboard {
         let player_index = processed_leaderboard
@@ -133,7 +133,7 @@ fn add_leaderboard_entry(
     commands: &mut Commands,
     root_entity: Entity,
     marker: &LeaderboardMarker,
-    leaderboard: &Vec<Score>,
+    leaderboard: &[Score],
     player_name: &String,
     player_score: f32,
 ) {
@@ -150,7 +150,13 @@ fn add_leaderboard_entry(
                         LeaderboardMarker::Number => (i + 1).to_string() + ".",
                         LeaderboardMarker::Score => format!("{} ", player_score as i32),
                         LeaderboardMarker::Player => {
-                            player_name.clone().split(' ').next().unwrap().to_string() + " (You)"
+                            player_name
+                                .to_owned()
+                                .split(' ')
+                                .next()
+                                .unwrap()
+                                .to_string()
+                                + " (You)"
                         }
                     },
                     TextStyle {
@@ -166,7 +172,7 @@ fn add_leaderboard_entry(
             });
         }
 
-        if leaderboard.len() == 0 || (i == last_index && player_index < last_index) {
+        if leaderboard.is_empty() || (i == last_index && player_index < last_index) {
             break;
         }
 
@@ -195,7 +201,7 @@ fn add_leaderboard_entry(
         });
     }
 
-    if leaderboard.len() == 0
+    if leaderboard.is_empty()
         || player_index != leaderboard.len()
         || last_index != leaderboard.len() - 1
     {
@@ -207,7 +213,13 @@ fn add_leaderboard_entry(
                 LeaderboardMarker::Number => (player_index + 1).to_string() + ".",
                 LeaderboardMarker::Score => format!("{} ", player_score as i32),
                 LeaderboardMarker::Player => {
-                    player_name.clone().split(' ').next().unwrap().to_string() + " (You)"
+                    player_name
+                        .to_owned()
+                        .split(' ')
+                        .next()
+                        .unwrap()
+                        .to_string()
+                        + " (You)"
                 }
             },
             TextStyle {
