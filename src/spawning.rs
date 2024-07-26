@@ -124,8 +124,8 @@ pub fn system_continuous_threat_spawning(
     let window_width = window.width();
     let buffer = 50.0;
 
-    let duck_count = duck_query.iter().count() as f32;
-    if current_threats.0 < (duck_count * 0.1) as i32 {
+    let duck_count = duck_query.iter().count();
+    if current_threats.0 * 15 < duck_count as i32 {
         let random_position_on_circle =
             Vec2::new(rand::random::<f32>().cos(), rand::random::<f32>().sin())
                 * (window_width * 0.5 + buffer);
