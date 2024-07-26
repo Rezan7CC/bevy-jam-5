@@ -116,7 +116,9 @@ pub fn system_hatch_eggs(
             commands.entity(entity).try_insert(Duckling);
             commands.entity(entity).try_insert(Boid);
 
-            player_stats.score += 1;
+            if !player_stats.is_simulating {
+                player_stats.score += 1;
+            }
 
             let random_direction =
                 Vec2::new(rand::random::<f32>() - 0.5, rand::random::<f32>() - 0.5).normalize();

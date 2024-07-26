@@ -1,6 +1,6 @@
 use crate::duck_boid::CloseAdults;
 use crate::life_cycles::Adult;
-use crate::spawning;
+use crate::{game_state, spawning};
 use bevy::prelude::*;
 use bevy::utils::HashSet;
 
@@ -56,6 +56,7 @@ pub fn system_build_relationships(
                 ..Default::default()
             })
             .insert(BreedingProgress::default())
+            .insert(game_state::RemoveOnRestart)
             .id();
 
         commands.entity(entity).try_insert(Sambo {

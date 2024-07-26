@@ -1,10 +1,14 @@
+use crate::game_state;
 use crate::leaderboard::LeaderboardMarker;
-use crate::GameState;
+use crate::player::PlayerStats;
 use bevy::prelude::*;
+use bevy_jornet::Leaderboard;
 
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 pub const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 pub const PRESSED_BUTTON: Color = Color::srgb(0.25, 0.5, 0.25);
+
+pub const RED_TEXT: Color = Color::srgb(0.5, 0.25, 0.25);
 
 pub const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.65);
@@ -13,23 +17,35 @@ const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.65);
 #[derive(Component)]
 pub enum UIButtonAction {
     Play,
+    ContinueSimulation,
+    Restart,
 }
 
 #[derive(Component)]
-pub struct OnMainMenuScreen;
+pub struct OnMenuScreen;
 
 pub fn system_ui_actions(
     interaction_query: Query<(&Interaction, &UIButtonAction), (Changed<Interaction>, With<Button>)>,
-    main_menu_screen: Query<Entity, With<OnMainMenuScreen>>,
-    mut game_state: ResMut<NextState<GameState>>,
+    main_menu_screen: Query<Entity, With<OnMenuScreen>>,
+    mut player_stats: ResMut<PlayerStats>,
+    mut game_state: ResMut<NextState<game_state::GameState>>,
     mut commands: Commands,
 ) {
     for (interaction, ui_button_action) in &interaction_query {
         if *interaction == Interaction::Pressed {
             match ui_button_action {
                 UIButtonAction::Play => {
-                    game_state.set(GameState::Running);
-                    despawn_screen::<OnMainMenuScreen>(&main_menu_screen, &mut commands);
+                    game_state.set(game_state::GameState::Running);
+                    despawn_screen::<OnMenuScreen>(&main_menu_screen, &mut commands);
+                }
+                UIButtonAction::ContinueSimulation => {
+                    player_stats.is_simulating = true;
+                    game_state.set(game_state::GameState::Running);
+                    despawn_screen::<OnMenuScreen>(&main_menu_screen, &mut commands);
+                }
+                UIButtonAction::Restart => {
+                    game_state.set(game_state::GameState::Restarting);
+                    despawn_screen::<OnMenuScreen>(&main_menu_screen, &mut commands);
                 }
             }
         }
@@ -93,7 +109,7 @@ pub fn system_create_main_menu(mut commands: Commands, asset_server: Res<AssetSe
                 },
                 ..default()
             },
-            OnMainMenuScreen,
+            OnMenuScreen,
         ))
         .with_children(|parent| {
             parent
@@ -146,6 +162,253 @@ pub fn system_create_main_menu(mut commands: Commands, asset_server: Res<AssetSe
         });
 }
 
+#[allow(dead_code)]
+pub fn system_create_time_over_menu(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    player_stats: Res<PlayerStats>,
+    leaderboard: ResMut<Leaderboard>,
+) {
+    // Common style for all buttons on the screen
+    let button_style = Style {
+        width: Val::Px(300.0),
+        height: Val::Px(65.0),
+        margin: UiRect::bottom(Val::Px(20.0)),
+        justify_content: JustifyContent::Center,
+        align_items: AlignItems::Center,
+        ..default()
+    };
+    let button_icon_style = Style {
+        width: Val::Px(30.0),
+        // This takes the icons out of the flexbox flow, to be positioned exactly
+        position_type: PositionType::Absolute,
+        // The icon will be close to the left border of the button
+        left: Val::Px(10.0),
+        ..default()
+    };
+    let button_text_style = TextStyle {
+        font_size: 20.0,
+        color: TEXT_COLOR,
+        ..default()
+    };
+
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    ..default()
+                },
+                ..default()
+            },
+            OnMenuScreen,
+        ))
+        .with_children(|parent| {
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    background_color: BACKGROUND_COLOR.into(),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn(
+                        TextBundle::from_section(
+                            "Time Over!",
+                            TextStyle {
+                                font_size: 80.0,
+                                color: PRESSED_BUTTON,
+                                ..default()
+                            },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::all(Val::Px(50.0)),
+                            ..default()
+                        }),
+                    );
+
+                    let player_score = player_stats.score;
+
+                    if leaderboard.get_player().is_some() {
+                        leaderboard.send_score(player_score as f32);
+                    }
+
+                    let score_string: String =
+                        "Your Score: ".to_owned() + player_score.to_string().as_str();
+                    parent.spawn(
+                        TextBundle::from_section(
+                            score_string,
+                            TextStyle {
+                                font_size: 40.0,
+                                color: TEXT_COLOR,
+                                ..default()
+                            },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::bottom(Val::Px(50.0)),
+                            ..default()
+                        }),
+                    );
+
+                    parent
+                        .spawn((
+                            ButtonBundle {
+                                style: button_style.clone(),
+                                background_color: NORMAL_BUTTON.into(),
+                                ..default()
+                            },
+                            UIButtonAction::Restart,
+                        ))
+                        .with_children(|parent| {
+                            let icon = asset_server.load("ui/right.png");
+                            parent.spawn(ImageBundle {
+                                style: button_icon_style.clone(),
+                                image: UiImage::new(icon),
+                                ..default()
+                            });
+                            parent.spawn(TextBundle::from_section(
+                                "Play Again",
+                                button_text_style.clone(),
+                            ));
+                        });
+
+                    parent
+                        .spawn((
+                            ButtonBundle {
+                                style: button_style.clone(),
+                                background_color: NORMAL_BUTTON.into(),
+                                ..default()
+                            },
+                            UIButtonAction::ContinueSimulation,
+                        ))
+                        .with_children(|parent| {
+                            let icon = asset_server.load("ui/right.png");
+                            parent.spawn(ImageBundle {
+                                style: button_icon_style.clone(),
+                                image: UiImage::new(icon),
+                                ..default()
+                            });
+                            parent.spawn(TextBundle::from_section(
+                                "Continue Simulation",
+                                button_text_style.clone(),
+                            ));
+                        });
+                });
+        });
+}
+
+#[allow(dead_code)]
+pub fn system_create_game_over_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // Common style for all buttons on the screen
+    let button_style = Style {
+        width: Val::Px(300.0),
+        height: Val::Px(65.0),
+        margin: UiRect::bottom(Val::Px(20.0)),
+        justify_content: JustifyContent::Center,
+        align_items: AlignItems::Center,
+        ..default()
+    };
+    let button_icon_style = Style {
+        width: Val::Px(30.0),
+        // This takes the icons out of the flexbox flow, to be positioned exactly
+        position_type: PositionType::Absolute,
+        // The icon will be close to the left border of the button
+        left: Val::Px(10.0),
+        ..default()
+    };
+    let button_text_style = TextStyle {
+        font_size: 20.0,
+        color: TEXT_COLOR,
+        ..default()
+    };
+
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    ..default()
+                },
+                ..default()
+            },
+            OnMenuScreen,
+        ))
+        .with_children(|parent| {
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    background_color: BACKGROUND_COLOR.into(),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn(
+                        TextBundle::from_section(
+                            "Game Over!",
+                            TextStyle {
+                                font_size: 80.0,
+                                color: RED_TEXT,
+                                ..default()
+                            },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::all(Val::Px(50.0)),
+                            ..default()
+                        }),
+                    );
+
+                    parent.spawn(
+                        TextBundle::from_section(
+                            "Only one lonely duck left :(",
+                            TextStyle {
+                                font_size: 20.0,
+                                color: TEXT_COLOR,
+                                ..default()
+                            },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::bottom(Val::Px(90.0)),
+                            ..default()
+                        }),
+                    );
+
+                    parent
+                        .spawn((
+                            ButtonBundle {
+                                style: button_style.clone(),
+                                background_color: NORMAL_BUTTON.into(),
+                                ..default()
+                            },
+                            UIButtonAction::Restart,
+                        ))
+                        .with_children(|parent| {
+                            let icon = asset_server.load("ui/right.png");
+                            parent.spawn(ImageBundle {
+                                style: button_icon_style.clone(),
+                                image: UiImage::new(icon),
+                                ..default()
+                            });
+                            parent.spawn(TextBundle::from_section(
+                                "Try Again",
+                                button_text_style.clone(),
+                            ));
+                        });
+                });
+        });
+}
+
 pub fn system_spawn_leaderboard_ui(mut commands: Commands) {
     commands
         .spawn(NodeBundle {
@@ -163,7 +426,7 @@ pub fn system_spawn_leaderboard_ui(mut commands: Commands) {
         .with_children(|parent| {
             parent.spawn(
                 TextBundle::from_section(
-                    "Leaderboard",
+                    "Leaderboard (Global)",
                     TextStyle {
                         font_size: 20.0,
                         color: TEXT_COLOR,

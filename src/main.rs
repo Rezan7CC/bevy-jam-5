@@ -9,6 +9,7 @@ mod breeding;
 mod cursor;
 mod duck_boid;
 mod food;
+mod game_state;
 mod leaderboard;
 mod life_cycles;
 mod movement;
@@ -21,13 +22,6 @@ mod ui;
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bevy_jornet::JornetPlugin;
-
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-enum GameState {
-    #[default]
-    Paused,
-    Running,
-}
 
 fn main() {
     App::new()
@@ -63,12 +57,14 @@ fn main() {
         .insert_resource(spawning::CurrentThreats::default())
         .insert_resource(leaderboard::ProcessedLeaderboard::default())
         .insert_resource(player::PlayerStats::default())
-        .insert_state(GameState::Paused)
+        .insert_state(game_state::GameState::Paused)
         .add_systems(
             Startup,
             (
                 setup,
                 leaderboard::system_setup_leaderboard,
+                //ui::system_create_game_over_menu,
+                //ui::system_create_time_over_menu,
                 ui::system_create_main_menu,
                 ui::system_spawn_leaderboard_ui,
                 spawning::load_assets,
@@ -76,9 +72,17 @@ fn main() {
                 spawning::system_spawn_threats.after(spawning::load_assets),
             ),
         )
+        //.add_systems(
+        //    OnEnter(game_state::GameState::Running),
+        //    leaderboard::system_add_test_score,
+        //)
         .add_systems(
-            OnEnter(GameState::Running),
-            leaderboard::system_add_test_score,
+            OnEnter(game_state::GameState::Restarting),
+            game_state::system_restart_game,
+        )
+        .add_systems(
+            OnExit(game_state::GameState::Restarting),
+            (spawning::system_spawn_boids, spawning::system_spawn_threats),
         )
         .add_systems(
             Update,
@@ -111,7 +115,7 @@ fn main() {
                 food::system_place_food_on_input,
                 sprite_animation::system_animate_sprites.after(movement::system_movement),
             )
-                .run_if(in_state(GameState::Running)),
+                .run_if(in_state(game_state::GameState::Running)),
         )
         .add_systems(
             Update,
@@ -123,7 +127,7 @@ fn main() {
                 cursor::system_update_game_cursor_position,
                 cursor::system_update_game_cursor_image,
             )
-                .run_if(in_state(GameState::Running)),
+                .run_if(in_state(game_state::GameState::Running)),
         )
         .add_systems(
             Update,
@@ -134,11 +138,11 @@ fn main() {
             ),
         )
         .add_systems(
-            OnEnter(GameState::Running),
+            OnEnter(game_state::GameState::Running),
             (cursor::system_enable_game_cursor,),
         )
         .add_systems(
-            OnEnter(GameState::Paused),
+            OnEnter(game_state::GameState::Paused),
             (cursor::system_disable_game_cursor,),
         )
         .run();

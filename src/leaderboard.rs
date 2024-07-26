@@ -3,13 +3,14 @@ use bevy::prelude::*;
 use bevy_jornet::{Leaderboard, Score};
 use std::cmp::Ordering;
 
-pub(crate) fn system_setup_leaderboard(mut leaderboard: ResMut<Leaderboard>) {
+pub fn system_setup_leaderboard(mut leaderboard: ResMut<Leaderboard>) {
     // `None` will create a new user with a random name
     leaderboard.create_player(None);
 
     leaderboard.refresh_leaderboard();
 }
 
+#[allow(dead_code)]
 pub fn system_add_test_score(leaderboard: ResMut<Leaderboard>) {
     if leaderboard.get_player().is_none() {
         return;

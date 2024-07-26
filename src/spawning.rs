@@ -1,6 +1,6 @@
 use crate::boid::Boid;
 use crate::food::Food;
-use crate::{life_cycles, movement, sprite_animation, threat_boid};
+use crate::{game_state, life_cycles, movement, sprite_animation, threat_boid};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
@@ -108,7 +108,7 @@ pub fn system_spawn_threats(
 }
 
 #[derive(Resource, Default)]
-pub struct CurrentThreats(i32);
+pub struct CurrentThreats(pub i32);
 pub fn system_continuous_threat_spawning(
     mut commands: Commands,
     loaded_assets: Res<LoadedAssets>,
@@ -122,7 +122,7 @@ pub fn system_continuous_threat_spawning(
         return;
     };
     let window_width = window.width();
-    let buffer = 300.0;
+    let buffer = 500.0;
 
     let duck_count = duck_query.iter().count();
     let threat_factor = match duck_count {
@@ -171,7 +171,8 @@ pub fn spawn_boid(position: Vec2, commands: &mut Commands, loaded_assets: &Res<L
             0.25,
             TimerMode::Once,
         )))
-        .insert(TextureAtlas::default());
+        .insert(TextureAtlas::default())
+        .insert(game_state::RemoveOnRestart);
 }
 
 const CAT_VARIATION_ASSETS: [&str; 4] = [
@@ -233,7 +234,8 @@ pub fn spawn_threat(
                 random_animation_timer,
                 TimerMode::Repeating,
             )),
-        ));
+        ))
+        .insert(game_state::RemoveOnRestart);
 }
 
 const FOOD_SPRITES: [&str; 9] = [
@@ -261,7 +263,8 @@ pub fn spawn_food(position: Vec2, commands: &mut Commands, loaded_assets: &Res<L
             },
             ..Default::default()
         })
-        .insert(Food);
+        .insert(Food)
+        .insert(game_state::RemoveOnRestart);
 }
 
 pub fn spawn_relationship_sprite(
@@ -275,21 +278,24 @@ pub fn spawn_relationship_sprite(
         last: 3,
         paused: false,
     };
-    commands.entity(entity).insert((
-        SpriteBundle {
-            transform: Transform {
-                translation: position.extend(5.0),
-                scale: Vec3::splat(0.5),
-                ..Default::default()
+    commands
+        .entity(entity)
+        .insert((
+            SpriteBundle {
+                transform: Transform {
+                    translation: position.extend(5.0),
+                    scale: Vec3::splat(0.5),
+                    ..Default::default()
+                },
+                texture: loaded_assets.heart_sprite_sheet.clone(),
+                ..default()
             },
-            texture: loaded_assets.heart_sprite_sheet.clone(),
-            ..default()
-        },
-        TextureAtlas {
-            layout: loaded_assets.heart_atlas_layout.clone(),
-            index: animation_indices.first,
-        },
-        animation_indices,
-        sprite_animation::AnimationTimer(Timer::from_seconds(0.25, TimerMode::Repeating)),
-    ));
+            TextureAtlas {
+                layout: loaded_assets.heart_atlas_layout.clone(),
+                index: animation_indices.first,
+            },
+            animation_indices,
+            sprite_animation::AnimationTimer(Timer::from_seconds(0.25, TimerMode::Repeating)),
+        ))
+        .insert(game_state::RemoveOnRestart);
 }
