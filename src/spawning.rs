@@ -92,7 +92,7 @@ pub fn system_spawn_threats(
     loaded_assets: Res<LoadedAssets>,
     mut current_threats: ResMut<CurrentThreats>,
 ) {
-    for index in 0..2 {
+    for index in 0..1 {
         let position = Vec2::new(
             rand::random::<f32>() * 800.0 - 400.0,
             rand::random::<f32>() * 600.0 - 300.0,
@@ -122,10 +122,16 @@ pub fn system_continuous_threat_spawning(
         return;
     };
     let window_width = window.width();
-    let buffer = 50.0;
+    let buffer = 300.0;
 
     let duck_count = duck_query.iter().count();
-    if current_threats.0 * 15 < duck_count as i32 {
+    let threat_factor = match duck_count {
+        0..=14 => 7,
+        15..=30 => 10,
+        _ => 20,
+    };
+
+    if current_threats.0 * threat_factor < duck_count as i32 {
         let random_position_on_circle =
             Vec2::new(rand::random::<f32>().cos(), rand::random::<f32>().sin())
                 * (window_width * 0.5 + buffer);

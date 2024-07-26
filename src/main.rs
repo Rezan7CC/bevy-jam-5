@@ -52,6 +52,8 @@ fn main() {
         .add_plugins(JornetPlugin::with_leaderboard(
             env!("JORNET_LEADERBOARD_ID"),
             env!("JORNET_LEADERBOARD_KEY"),
+            //&uuid::Uuid::NAMESPACE_X500.to_string(),
+            //&uuid::Uuid::NAMESPACE_X500.to_string(),
         ))
         .insert_resource(food::FoodPlacementTimer(Timer::from_seconds(
             food::FOOD_PLACEMENT_COOLDOWN,

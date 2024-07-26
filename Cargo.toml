@@ -19,3 +19,4 @@ opt-level = 3
 bevy = "0.14"
 bevy_jornet = "0.8.0"
 rand = "0.8.5"
+uuid = "1.10.0"

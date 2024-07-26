@@ -1651,6 +1651,7 @@ dependencies = [
  "bevy",
  "bevy_jornet",
  "rand",
+ "uuid",
 ]
 
 [[package]]

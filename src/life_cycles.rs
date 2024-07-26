@@ -21,8 +21,8 @@ pub const EGG_HATCH_TIME_MAX: f32 = 15.0 * TIME_FACTOR;
 pub const DUCKLING_TO_JUVENILE_TIME_MIN: f32 = 10.0 * TIME_FACTOR;
 pub const DUCKLING_TO_JUVENILE_TIME_MAX: f32 = 30.0 * TIME_FACTOR;
 
-pub const JUVENILE_TO_ADULT_TIME_MIN: f32 = 10.0 * TIME_FACTOR;
-pub const JUVENILE_TO_ADULT_TIME_MAX: f32 = 20.0 * TIME_FACTOR;
+pub const JUVENILE_TO_ADULT_TIME_MIN: f32 = 8.0 * TIME_FACTOR;
+pub const JUVENILE_TO_ADULT_TIME_MAX: f32 = 15.0 * TIME_FACTOR;
 
 pub fn system_decrease_lifecycle_time(time: Res<Time>, mut query: Query<&mut LifeCycleTime>) {
     for mut life_cycle_time in query.iter_mut() {
