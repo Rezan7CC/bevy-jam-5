@@ -236,10 +236,15 @@ pub fn spawn_threat(
         ));
 }
 
-const FOOD_SPRITES: [&str; 4] = [
+const FOOD_SPRITES: [&str; 9] = [
+    "foods/bread.png",
+    "foods/bread.png",
+    "foods/bread.png",
     "foods/bread.png",
     "foods/pretzel.png",
+    "foods/pretzel.png",
     "foods/cake.png",
+    "foods/croissant.png",
     "foods/croissant.png",
 ];
 
