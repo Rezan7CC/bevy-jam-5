@@ -6,6 +6,8 @@ use bevy::window::PrimaryWindow;
 
 #[derive(Resource, Default)]
 pub struct LoadedAssets {
+    pub pixel_font_handle: Handle<Font>,
+
     pub cursor_empty_sprite: Handle<Image>,
     pub cursor_food_sprite: Handle<Image>,
 
@@ -36,6 +38,8 @@ pub fn load_assets(
     mut loaded_assets: ResMut<LoadedAssets>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
+    loaded_assets.pixel_font_handle = asset_server.load("ui/Stacked pixel.ttf");
+
     loaded_assets.cursor_empty_sprite = asset_server.load("cursor/frame_0_delay-0.1s.png");
     loaded_assets.cursor_food_sprite = asset_server.load("cursor/frame_3_delay-0.1s.png");
 

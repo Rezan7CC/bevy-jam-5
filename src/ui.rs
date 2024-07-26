@@ -1,6 +1,6 @@
-use crate::game_state;
 use crate::leaderboard::LeaderboardMarker;
 use crate::player::PlayerStats;
+use crate::{game_state, spawning};
 use bevy::prelude::*;
 use bevy_jornet::Leaderboard;
 
@@ -11,7 +11,7 @@ pub const PRESSED_BUTTON: Color = Color::srgb(0.25, 0.5, 0.25);
 pub const RED_TEXT: Color = Color::srgb(0.5, 0.25, 0.25);
 
 pub const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.65);
+const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.80);
 
 // All actions that can be triggered from a button click
 #[derive(Component)]
@@ -73,7 +73,11 @@ fn despawn_screen<T: Component>(to_despawn: &Query<Entity, With<T>>, commands: &
     }
 }
 
-pub fn system_create_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn system_create_main_menu(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    loaded_assets: Res<spawning::LoadedAssets>,
+) {
     // Common style for all buttons on the screen
     let button_style = Style {
         width: Val::Px(250.0),
@@ -128,9 +132,9 @@ pub fn system_create_main_menu(mut commands: Commands, asset_server: Res<AssetSe
                         TextBundle::from_section(
                             "Ducky Boids",
                             TextStyle {
+                                font: loaded_assets.pixel_font_handle.clone(),
                                 font_size: 100.0,
-                                color: TEXT_COLOR,
-                                ..default()
+                                color: Color::srgb(0.85, 0.75, 0.2),
                             },
                         )
                         .with_style(Style {
@@ -168,6 +172,7 @@ pub fn system_create_time_over_menu(
     asset_server: Res<AssetServer>,
     player_stats: Res<PlayerStats>,
     leaderboard: ResMut<Leaderboard>,
+    loaded_assets: Res<spawning::LoadedAssets>,
 ) {
     // Common style for all buttons on the screen
     let button_style = Style {
@@ -222,9 +227,9 @@ pub fn system_create_time_over_menu(
                         TextBundle::from_section(
                             "Time Over!",
                             TextStyle {
+                                font: loaded_assets.pixel_font_handle.clone(),
                                 font_size: 80.0,
                                 color: PRESSED_BUTTON,
-                                ..default()
                             },
                         )
                         .with_style(Style {
@@ -304,7 +309,11 @@ pub fn system_create_time_over_menu(
 }
 
 #[allow(dead_code)]
-pub fn system_create_game_over_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn system_create_game_over_menu(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    loaded_assets: Res<spawning::LoadedAssets>,
+) {
     // Common style for all buttons on the screen
     let button_style = Style {
         width: Val::Px(300.0),
@@ -358,9 +367,9 @@ pub fn system_create_game_over_menu(mut commands: Commands, asset_server: Res<As
                         TextBundle::from_section(
                             "Game Over!",
                             TextStyle {
+                                font: loaded_assets.pixel_font_handle.clone(),
                                 font_size: 80.0,
                                 color: RED_TEXT,
-                                ..default()
                             },
                         )
                         .with_style(Style {
@@ -409,7 +418,10 @@ pub fn system_create_game_over_menu(mut commands: Commands, asset_server: Res<As
         });
 }
 
-pub fn system_spawn_leaderboard_ui(mut commands: Commands) {
+pub fn system_spawn_leaderboard_ui(
+    mut commands: Commands,
+    loaded_assets: Res<spawning::LoadedAssets>,
+) {
     commands
         .spawn(NodeBundle {
             style: Style {
@@ -426,11 +438,11 @@ pub fn system_spawn_leaderboard_ui(mut commands: Commands) {
         .with_children(|parent| {
             parent.spawn(
                 TextBundle::from_section(
-                    "Leaderboard (Global)",
+                    "Leaderboard  (Global)",
                     TextStyle {
-                        font_size: 20.0,
+                        font: loaded_assets.pixel_font_handle.clone(),
+                        font_size: 16.0,
                         color: TEXT_COLOR,
-                        ..default()
                     },
                 )
                 .with_style(Style {
