@@ -25,10 +25,9 @@ pub fn spawn_particle_systems(
 }
 */
 
-#[allow(dead_code)]
 pub fn spawn_duck_eaten_effect(
-    mut commands: Commands,
-    loaded_assets: Res<spawning::LoadedAssets>,
+    commands: &mut Commands,
+    loaded_assets: &Res<spawning::LoadedAssets>,
     world_position: Vec2,
     start_color: Color,
 ) {
@@ -63,25 +62,24 @@ pub fn spawn_duck_eaten_effect(
     ));
 }
 
-#[allow(dead_code)]
 pub fn spawn_duck_cycle_transition_effect(
-    mut commands: Commands,
-    loaded_assets: Res<spawning::LoadedAssets>,
+    commands: &mut Commands,
+    loaded_assets: &Res<spawning::LoadedAssets>,
     world_position: Vec2,
 ) {
     let start_color = Color::srgba(0.8, 0.8, 0.8, 0.5);
     let end_color = start_color.with_alpha(0.0);
     commands.spawn((
         ParticleSystemBundle {
-            transform: Transform::from_translation(world_position.extend(0.)),
+            transform: Transform::from_translation(world_position.extend(5.)),
             particle_system: ParticleSystem {
                 texture: loaded_assets.circle_image.clone().into(),
                 spawn_rate_per_second: 0.0.into(),
-                max_particles: 20,
+                max_particles: 25,
                 initial_speed: (10.0..70.0).into(),
                 initial_rotation: (0.0..360.0).into(),
                 lifetime: (0.3..0.4).into(),
-                scale: (1.2..0.8).into(),
+                scale: (1.0..0.6).into(),
                 velocity_modifiers: vec![
                     VelocityModifier::Drag(0.001.into()),
                     VelocityModifier::Vector(Vec3::new(0.0, -50.0, 0.0).into()),
@@ -89,7 +87,7 @@ pub fn spawn_duck_cycle_transition_effect(
                 color: (start_color..end_color).into(),
                 bursts: vec![ParticleBurst {
                     time: 0.0,
-                    count: 20,
+                    count: 25,
                 }],
                 ..ParticleSystem::oneshot()
             },
@@ -99,10 +97,9 @@ pub fn spawn_duck_cycle_transition_effect(
     ));
 }
 
-#[allow(dead_code)]
 pub fn spawn_food_eaten_effect(
-    mut commands: Commands,
-    loaded_assets: Res<spawning::LoadedAssets>,
+    commands: &mut Commands,
+    loaded_assets: &Res<spawning::LoadedAssets>,
     world_position: Vec2,
 ) {
     let start_color: Color = Color::srgba(0.65, 0.5, 0.4, 1.0);
@@ -135,10 +132,9 @@ pub fn spawn_food_eaten_effect(
     ));
 }
 
-#[allow(dead_code)]
 pub fn spawn_egg_hatched_effect(
-    mut commands: Commands,
-    loaded_assets: Res<spawning::LoadedAssets>,
+    commands: &mut Commands,
+    loaded_assets: &Res<spawning::LoadedAssets>,
     world_position: Vec2,
 ) {
     let start_color: Color = Color::srgba(0.8, 0.6, 0.5, 1.0);

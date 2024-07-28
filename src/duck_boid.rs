@@ -1,6 +1,6 @@
 use crate::boid::Boid;
 use crate::movement::Velocity;
-use crate::{food, life_cycles, threat_boid};
+use crate::{food, life_cycles, spawning, threat_boid, vfx};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 
@@ -145,6 +145,7 @@ const TOWARDS_FOOD_FACTOR: f32 = 120.0;
 pub fn system_boids_food(
     time: Res<Time>,
     mut commands: Commands,
+    loaded_assets: Res<spawning::LoadedAssets>,
     food_query: Query<(Entity, &Transform), With<food::Food>>,
     mut duck_query: Query<(&Transform, &mut Velocity), With<Boid>>,
 ) {
@@ -163,9 +164,19 @@ pub fn system_boids_food(
         if closest_food.is_some() {
             let closet_food_distance_2 = closest_food.unwrap().1;
             if closet_food_distance_2 <= FOOD_EATING_RADIUS_2 {
+                let mut despawned: bool = false;
                 if let Some(mut entity_cmd) = commands.get_entity(closest_food.unwrap().2) {
                     entity_cmd.despawn();
+                    despawned = true;
                 }
+                if despawned {
+                    vfx::spawn_food_eaten_effect(
+                        &mut commands,
+                        &loaded_assets,
+                        closest_food.unwrap().0,
+                    );
+                }
+
                 continue;
             }
 

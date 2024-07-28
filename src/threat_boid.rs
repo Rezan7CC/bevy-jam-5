@@ -1,5 +1,5 @@
 use crate::spawning::LoadedAssets;
-use crate::{audio, boid, movement, sprite_animation};
+use crate::{audio, boid, movement, sprite_animation, vfx};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
@@ -39,10 +39,22 @@ pub fn system_boid_towards_closest_duck(
 
         if closest_duck.is_some() && threat.eating_cooldown <= 0.0 {
             if closest_duck.unwrap().1 <= THREAT_EATING_RADIUS_2 {
+                let mut despawned: bool = false;
                 if let Some(mut entity_cmd) = commands.get_entity(closest_duck.unwrap().2) {
                     entity_cmd.despawn();
                     audio::play_duck_eaten(&loaded_assets, &mut commands, &active_audio_sources);
+                    despawned = true;
                 }
+
+                if despawned {
+                    vfx::spawn_duck_eaten_effect(
+                        &mut commands,
+                        &loaded_assets,
+                        closest_duck.unwrap().0,
+                        Color::srgba(1.0, 1.0, 0.8, 0.5),
+                    );
+                }
+
                 threat.eating_cooldown = THREAT_EATING_COOLDOWN_DURATION;
                 continue;
             }

@@ -1,5 +1,5 @@
 use crate::boid::Boid;
-use crate::{audio, duck_boid, movement, player, spawning, sprite_animation};
+use crate::{audio, duck_boid, movement, player, spawning, sprite_animation, vfx};
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -117,6 +117,11 @@ pub fn system_hatch_eggs(
             commands.entity(entity).try_insert(Duckling);
             commands.entity(entity).try_insert(Boid);
 
+            vfx::spawn_egg_hatched_effect(
+                &mut commands,
+                &loaded_assets,
+                transform.translation.xy(),
+            );
             audio::play_egg_pop(&loaded_assets, &mut commands, &active_audio_sources);
             player_stats.ducks_born += 1;
             if !player_stats.is_simulating {
@@ -186,6 +191,12 @@ pub fn system_duckling_to_juvenile(
         if transitioned {
             commands.entity(entity).remove::<Duckling>();
             commands.entity(entity).try_insert(Juvenile);
+
+            vfx::spawn_duck_cycle_transition_effect(
+                &mut commands,
+                &loaded_assets,
+                transform.translation.xy(),
+            );
         }
     }
 }
@@ -243,6 +254,12 @@ pub fn system_juvenile_to_adult(
             commands
                 .entity(entity)
                 .try_insert(duck_boid::CloseAdults::default());
+
+            vfx::spawn_duck_cycle_transition_effect(
+                &mut commands,
+                &loaded_assets,
+                transform.translation.xy(),
+            );
         }
     }
 }
