@@ -1,6 +1,6 @@
 use crate::leaderboard::LeaderboardMarker;
 use crate::player::PlayerStats;
-use crate::{game_state, spawning};
+use crate::{audio, game_state, spawning};
 use bevy::prelude::*;
 use bevy_jornet::Leaderboard;
 
@@ -38,20 +38,24 @@ pub fn system_ui_actions(
     mut player_stats: ResMut<PlayerStats>,
     mut game_state: ResMut<NextState<game_state::GameState>>,
     mut commands: Commands,
+    loaded_assets: Res<spawning::LoadedAssets>,
 ) {
     for (interaction, ui_button_action) in &interaction_query {
         if *interaction == Interaction::Pressed {
             match ui_button_action {
                 UIButtonAction::Play => {
+                    audio::play_button_clicked(&loaded_assets, &mut commands);
                     game_state.set(game_state::GameState::Running);
                     despawn_screen::<OnMenuScreen>(&main_menu_screen, &mut commands);
                 }
                 UIButtonAction::ContinueSimulation => {
                     player_stats.is_simulating = true;
+                    audio::play_button_clicked(&loaded_assets, &mut commands);
                     game_state.set(game_state::GameState::Running);
                     despawn_screen::<OnMenuScreen>(&main_menu_screen, &mut commands);
                 }
                 UIButtonAction::Restart => {
+                    audio::play_button_clicked(&loaded_assets, &mut commands);
                     game_state.set(game_state::GameState::Restarting);
                     despawn_screen::<OnMenuScreen>(&main_menu_screen, &mut commands);
                 }

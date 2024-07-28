@@ -1,5 +1,5 @@
 use crate::spawning::LoadedAssets;
-use crate::{boid, movement, sprite_animation};
+use crate::{audio, boid, movement, sprite_animation};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
@@ -9,7 +9,7 @@ pub struct Threat {
     pub running: bool,
 }
 
-const THREAT_VISIBILITY_RADIUS_2: f32 = 145.0 * 145.0;
+const THREAT_VISIBILITY_RADIUS_2: f32 = 145.0 * 145.0 * 100.0;
 const TOWARDS_CLOSEST_DUCK_FACTOR: f32 = 300.0;
 const DECELERATION_FACTOR: f32 = 150.0;
 const THREAT_EATING_RADIUS_2: f32 = 30.0 * 30.0;
@@ -20,6 +20,8 @@ pub fn system_boid_towards_closest_duck(
     duck_query: Query<(Entity, &Transform), (With<boid::Boid>, Without<Threat>)>,
     mut threat_query: Query<(&Transform, &mut movement::Velocity, &mut Threat)>,
     window_query: Query<&Window, With<PrimaryWindow>>,
+    loaded_assets: Res<LoadedAssets>,
+    active_audio_sources: Res<audio::ActiveAudioSources>,
 ) {
     for (threat_transform, mut threat_velocity, mut threat) in threat_query.iter_mut() {
         threat.eating_cooldown -= time.delta_seconds();
@@ -39,6 +41,7 @@ pub fn system_boid_towards_closest_duck(
             if closest_duck.unwrap().1 <= THREAT_EATING_RADIUS_2 {
                 if let Some(mut entity_cmd) = commands.get_entity(closest_duck.unwrap().2) {
                     entity_cmd.despawn();
+                    audio::play_duck_eaten(&loaded_assets, &mut commands, &active_audio_sources);
                 }
                 threat.eating_cooldown = THREAT_EATING_COOLDOWN_DURATION;
                 continue;

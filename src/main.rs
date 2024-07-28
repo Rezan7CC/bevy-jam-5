@@ -56,6 +56,7 @@ fn main() {
         )))
         .insert_resource(spawning::LoadedAssets::default())
         .insert_resource(spawning::CurrentThreats::default())
+        .insert_resource(audio::ActiveAudioSources::default())
         .insert_resource(leaderboard::ProcessedLeaderboard::default())
         .insert_resource(player::PlayerStats::default())
         .insert_state(game_state::GameState::Paused)
@@ -151,6 +152,7 @@ fn main() {
                 ui::system_ui_actions,
                 ui::system_button_color,
                 leaderboard::system_display_leaderboard,
+                audio::system_update_active_audio_sources,
             ),
         )
         .add_systems(

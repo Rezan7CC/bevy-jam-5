@@ -31,6 +31,10 @@ pub struct LoadedAssets {
     heart_atlas_layout: Handle<TextureAtlasLayout>,
 
     food_sprites: Vec<Handle<Image>>,
+
+    pub pop_sound: Handle<AudioSource>,
+    pub duck_eaten_sound: Handle<AudioSource>,
+    pub button_clicked_sound: Handle<AudioSource>,
 }
 
 pub fn load_assets(
@@ -79,6 +83,10 @@ pub fn load_assets(
         .iter()
         .map(|path| asset_server.load(*path))
         .collect();
+
+    loaded_assets.pop_sound = asset_server.load("audio/pop.mp3");
+    loaded_assets.duck_eaten_sound = asset_server.load("audio/tennis-smash-100733.mp3");
+    loaded_assets.button_clicked_sound = asset_server.load("audio/90s-game-ui-2-185095.mp3");
 }
 
 pub fn system_spawn_boids(mut commands: Commands, loaded_assets: Res<LoadedAssets>) {

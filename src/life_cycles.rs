@@ -1,5 +1,5 @@
 use crate::boid::Boid;
-use crate::{duck_boid, movement, player, spawning, sprite_animation};
+use crate::{audio, duck_boid, movement, player, spawning, sprite_animation};
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -79,6 +79,7 @@ pub fn system_hatch_eggs(
         ),
         With<Egg>,
     >,
+    active_audio_sources: Res<audio::ActiveAudioSources>,
 ) {
     for (
         entity,
@@ -116,6 +117,7 @@ pub fn system_hatch_eggs(
             commands.entity(entity).try_insert(Duckling);
             commands.entity(entity).try_insert(Boid);
 
+            audio::play_egg_pop(&loaded_assets, &mut commands, &active_audio_sources);
             player_stats.ducks_born += 1;
             if !player_stats.is_simulating {
                 player_stats.score += 1;
