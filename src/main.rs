@@ -140,6 +140,7 @@ fn main() {
                 cursor::system_update_game_cursor_image,
                 game_state::system_update_remaining_time,
                 game_state::system_update_game_status_ui,
+                game_state::system_check_game_over_condition,
             )
                 .run_if(in_state(game_state::GameState::Running)),
         )

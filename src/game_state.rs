@@ -1,5 +1,5 @@
 use crate::player::PlayerStats;
-use crate::{leaderboard, life_cycles, player, spawning, ui};
+use crate::{life_cycles, player, spawning, ui};
 use bevy::prelude::*;
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
@@ -21,13 +21,11 @@ pub fn system_restart_game(
     mut game_state: ResMut<NextState<GameState>>,
     mut current_threats: ResMut<spawning::CurrentThreats>,
     mut player_stats: ResMut<player::PlayerStats>,
-    mut processed_leaderboard: ResMut<leaderboard::ProcessedLeaderboard>,
 ) {
     current_threats.0 = 0;
     player_stats.score = 0;
     player_stats.ducks_born = 0;
     player_stats.is_simulating = false;
-    processed_leaderboard.last_player_score = 0;
 
     game_state.set(GameState::Running);
     for entity in query.iter() {
@@ -69,6 +67,28 @@ pub fn system_update_remaining_time(
             }
             text.sections[0].value = "Remaining Time: Endless".to_string();
         }
+    }
+}
+
+pub fn system_check_game_over_condition(
+    player_stats: Res<player::PlayerStats>,
+    mut game_state: ResMut<NextState<GameState>>,
+    ducks_and_eggs_query: Query<
+        Entity,
+        Or<(
+            With<life_cycles::Duckling>,
+            With<life_cycles::Juvenile>,
+            With<life_cycles::Adult>,
+            With<life_cycles::Egg>,
+        )>,
+    >,
+) {
+    if player_stats.is_simulating {
+        return;
+    }
+
+    if ducks_and_eggs_query.iter().count() == 1 {
+        game_state.set(GameState::GameOver);
     }
 }
 
