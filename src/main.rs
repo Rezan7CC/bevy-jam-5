@@ -19,10 +19,12 @@ mod spawning;
 mod sprite_animation;
 mod threat_boid;
 mod ui;
+mod vfx;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bevy_jornet::JornetPlugin;
+//use bevy::input::common_conditions::input_just_pressed;
 
 fn main() {
     App::new()
@@ -50,6 +52,7 @@ fn main() {
             //&uuid::Uuid::NAMESPACE_X500.to_string(),
             //&uuid::Uuid::NAMESPACE_X500.to_string(),
         ))
+        .add_plugins(bevy_particle_systems::ParticleSystemPlugin)
         .insert_resource(food::FoodPlacementTimer(Timer::from_seconds(
             food::FOOD_PLACEMENT_COOLDOWN,
             TimerMode::Once,
@@ -153,6 +156,7 @@ fn main() {
                 ui::system_button_color,
                 leaderboard::system_display_leaderboard,
                 audio::system_update_active_audio_sources,
+                //vfx::spawn_particle_systems.run_if(input_just_pressed(MouseButton::Left)),
             ),
         )
         .add_systems(

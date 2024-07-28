@@ -32,6 +32,10 @@ pub struct LoadedAssets {
 
     food_sprites: Vec<Handle<Image>>,
 
+    pub feather_image: Handle<Image>,
+    pub circle_image: Handle<Image>,
+    pub egg_shell_image: Handle<Image>,
+
     pub pop_sound: Handle<AudioSource>,
     pub duck_eaten_sound: Handle<AudioSource>,
     pub button_clicked_sound: Handle<AudioSource>,
@@ -83,6 +87,10 @@ pub fn load_assets(
         .iter()
         .map(|path| asset_server.load(*path))
         .collect();
+
+    loaded_assets.feather_image = asset_server.load("duckfeather2_edited.png");
+    loaded_assets.circle_image = asset_server.load("pixel_circle.png");
+    loaded_assets.egg_shell_image = asset_server.load("pixel_shell.png");
 
     loaded_assets.pop_sound = asset_server.load("audio/pop.mp3");
     loaded_assets.duck_eaten_sound = asset_server.load("audio/tennis-smash-100733.mp3");
