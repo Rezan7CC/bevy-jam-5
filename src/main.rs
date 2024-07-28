@@ -64,8 +64,6 @@ fn main() {
                 setup,
                 leaderboard::system_setup_leaderboard,
                 spawning::load_assets,
-                //ui::system_create_game_over_menu,
-                //ui::system_create_time_over_menu,
                 ui::system_create_main_menu.after(spawning::load_assets),
                 ui::system_spawn_leaderboard_ui.after(spawning::load_assets),
                 spawning::system_spawn_boids.after(spawning::load_assets),
@@ -83,6 +81,20 @@ fn main() {
         .add_systems(
             OnExit(game_state::GameState::Restarting),
             (spawning::system_spawn_boids, spawning::system_spawn_threats),
+        )
+        .add_systems(
+            OnEnter(game_state::GameState::TimeOver),
+            (
+                ui::system_create_time_over_menu,
+                game_state::system_change_state_to_paused,
+            ),
+        )
+        .add_systems(
+            OnEnter(game_state::GameState::GameOver),
+            (
+                ui::system_create_game_over_menu,
+                game_state::system_change_state_to_paused,
+            ),
         )
         .add_systems(
             Update,
@@ -126,6 +138,7 @@ fn main() {
                 life_cycles::system_juvenile_to_adult,
                 cursor::system_update_game_cursor_position,
                 cursor::system_update_game_cursor_image,
+                game_state::system_update_remaining_time,
             )
                 .run_if(in_state(game_state::GameState::Running)),
         )
@@ -139,7 +152,10 @@ fn main() {
         )
         .add_systems(
             OnEnter(game_state::GameState::Running),
-            (cursor::system_enable_game_cursor,),
+            (
+                game_state::system_reset_remaining_time,
+                cursor::system_enable_game_cursor,
+            ),
         )
         .add_systems(
             OnEnter(game_state::GameState::Paused),

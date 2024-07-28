@@ -25,8 +25,8 @@ pub enum UIButtonAction {
 #[derive(Component)]
 pub struct OnMenuScreen;
 
-#[derive(Component)]
-pub enum GameStatusWidget {
+#[derive(Component, PartialEq)]
+pub enum GameStatusWidgets {
     RemainingTime,
     DucklingsBorn,
     DucksAlive,
@@ -564,7 +564,7 @@ pub fn system_spawn_leaderboard_ui(
 
                     parent02.spawn((
                         TextBundle::from_section(
-                            "Remaining Time: ",
+                            "Remaining Time: 300",
                             TextStyle {
                                 font_size: 15.0,
                                 color: TEXT_COLOR,
@@ -572,15 +572,15 @@ pub fn system_spawn_leaderboard_ui(
                             },
                         )
                         .with_style(Style {
-                            margin: UiRect::px(10.0, 0.0, 5.0, 0.0),
+                            margin: UiRect::px(10.0, 10.0, 5.0, 0.0),
                             ..default()
                         }),
-                        GameStatusWidget::RemainingTime,
+                        GameStatusWidgets::RemainingTime,
                     ));
 
                     parent02.spawn((
                         TextBundle::from_section(
-                            "Ducks Born: ",
+                            "Ducks Born: 0",
                             TextStyle {
                                 font_size: 15.0,
                                 color: TEXT_COLOR,
@@ -588,15 +588,15 @@ pub fn system_spawn_leaderboard_ui(
                             },
                         )
                         .with_style(Style {
-                            margin: UiRect::px(10.0, 0.0, 5.0, 0.0),
+                            margin: UiRect::px(10.0, 10.0, 5.0, 0.0),
                             ..default()
                         }),
-                        GameStatusWidget::DucklingsBorn,
+                        GameStatusWidgets::DucklingsBorn,
                     ));
 
                     parent02.spawn((
                         TextBundle::from_section(
-                            "Ducks Alive: ",
+                            "Ducks Alive: 0",
                             TextStyle {
                                 font_size: 15.0,
                                 color: TEXT_COLOR,
@@ -604,10 +604,10 @@ pub fn system_spawn_leaderboard_ui(
                             },
                         )
                         .with_style(Style {
-                            margin: UiRect::px(10.0, 0.0, 5.0, 4.0),
+                            margin: UiRect::px(10.0, 10.0, 5.0, 4.0),
                             ..default()
                         }),
-                        GameStatusWidget::DucksAlive,
+                        GameStatusWidgets::DucksAlive,
                     ));
                 });
         });

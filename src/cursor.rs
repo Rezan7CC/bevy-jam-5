@@ -58,7 +58,7 @@ pub fn system_disable_game_cursor(
         return;
     };
 
-    window.cursor.visible = false;
+    window.cursor.visible = true;
     commands.entity(cursor).despawn();
 }
 
