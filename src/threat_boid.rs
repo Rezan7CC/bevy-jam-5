@@ -9,7 +9,7 @@ pub struct Threat {
     pub running: bool,
 }
 
-const THREAT_VISIBILITY_RADIUS_2: f32 = 145.0 * 145.0 * 100.0;
+const THREAT_VISIBILITY_RADIUS_2: f32 = 145.0 * 145.0;
 const TOWARDS_CLOSEST_DUCK_FACTOR: f32 = 300.0;
 const DECELERATION_FACTOR: f32 = 150.0;
 const THREAT_EATING_RADIUS_2: f32 = 30.0 * 30.0;
