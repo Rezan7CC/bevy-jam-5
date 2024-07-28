@@ -42,6 +42,7 @@ fn main() {
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
+                        fit_canvas_to_parent: true,
                         title: "Ducky Boids".to_string(),
                         ..Default::default()
                     }),
