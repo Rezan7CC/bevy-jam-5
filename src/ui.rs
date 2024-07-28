@@ -9,6 +9,7 @@ pub const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 pub const PRESSED_BUTTON: Color = Color::srgb(0.25, 0.5, 0.25);
 
 pub const RED_TEXT: Color = Color::srgb(0.5, 0.25, 0.25);
+pub const YELLOW_TEXT: Color = Color::srgb(0.85, 0.75, 0.2);
 
 pub const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 0.80);
@@ -23,6 +24,13 @@ pub enum UIButtonAction {
 
 #[derive(Component)]
 pub struct OnMenuScreen;
+
+#[derive(Component)]
+pub enum GameStatusWidget {
+    RemainingTime,
+    DucklingsBorn,
+    DucksAlive,
+}
 
 pub fn system_ui_actions(
     interaction_query: Query<(&Interaction, &UIButtonAction), (Changed<Interaction>, With<Button>)>,
@@ -134,7 +142,7 @@ pub fn system_create_main_menu(
                             TextStyle {
                                 font: loaded_assets.pixel_font_handle.clone(),
                                 font_size: 100.0,
-                                color: Color::srgb(0.85, 0.75, 0.2),
+                                color: YELLOW_TEXT,
                             },
                         )
                         .with_style(Style {
@@ -428,87 +436,178 @@ pub fn system_spawn_leaderboard_ui(
                 margin: UiRect::new(Val::Px(15.0), Val::Auto, Val::Px(10.0), Val::Auto),
                 justify_content: JustifyContent::Start,
                 align_items: AlignItems::Start,
-                flex_direction: FlexDirection::Column,
-                //border: UiRect::all(Val::Px(30.0)),
+                flex_direction: FlexDirection::Row,
                 ..default()
             },
-            background_color: BACKGROUND_COLOR.into(),
             ..default()
         })
         .with_children(|parent| {
-            parent.spawn(
-                TextBundle::from_section(
-                    "Leaderboard  (Global)",
-                    TextStyle {
-                        font: loaded_assets.pixel_font_handle.clone(),
-                        font_size: 16.0,
-                        color: TEXT_COLOR,
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        margin: UiRect::new(Val::Px(15.0), Val::Auto, Val::Px(10.0), Val::Auto),
+                        justify_content: JustifyContent::Start,
+                        align_items: AlignItems::Start,
+                        flex_direction: FlexDirection::Column,
+                        //border: UiRect::all(Val::Px(30.0)),
+                        ..default()
                     },
-                )
-                .with_style(Style {
-                    margin: UiRect::px(10.0, 0.0, 5.0, 0.0),
+                    background_color: BACKGROUND_COLOR.into(),
                     ..default()
-                }),
-            );
+                })
+                .with_children(|parent02| {
+                    parent02.spawn(
+                        TextBundle::from_section(
+                            "Leaderboard  (Global)",
+                            TextStyle {
+                                font: loaded_assets.pixel_font_handle.clone(),
+                                font_size: 16.0,
+                                color: TEXT_COLOR,
+                            },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::px(10.0, 0.0, 5.0, 0.0),
+                            ..default()
+                        }),
+                    );
+
+                    parent02
+                        .spawn(NodeBundle {
+                            style: Style {
+                                flex_direction: FlexDirection::Row,
+                                justify_content: JustifyContent::Start,
+                                align_items: AlignItems::Start,
+                                margin: UiRect::px(5.0, 0.0, 0.0, 4.0),
+                                ..default()
+                            },
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            parent.spawn((
+                                NodeBundle {
+                                    style: Style {
+                                        min_width: Val::Px(30.0),
+                                        max_width: Val::Px(60.0),
+                                        flex_direction: FlexDirection::Column,
+                                        justify_content: JustifyContent::Start,
+                                        align_items: AlignItems::Start,
+                                        margin: UiRect::top(Val::Px(10.0)),
+                                        ..default()
+                                    },
+
+                                    ..default()
+                                },
+                                LeaderboardMarker::Number,
+                            ));
+                            parent.spawn((
+                                NodeBundle {
+                                    style: Style {
+                                        min_width: Val::Px(150.0),
+                                        max_width: Val::Px(200.0),
+                                        flex_direction: FlexDirection::Column,
+                                        justify_content: JustifyContent::Start,
+                                        align_items: AlignItems::Start,
+                                        margin: UiRect::top(Val::Px(10.0)),
+                                        ..default()
+                                    },
+
+                                    ..default()
+                                },
+                                LeaderboardMarker::Player,
+                            ));
+                            parent.spawn((
+                                NodeBundle {
+                                    style: Style {
+                                        min_width: Val::Px(30.0),
+                                        max_width: Val::Px(150.0),
+                                        flex_direction: FlexDirection::Column,
+                                        justify_content: JustifyContent::Start,
+                                        align_items: AlignItems::Start,
+                                        margin: UiRect::top(Val::Px(10.0)),
+                                        ..default()
+                                    },
+                                    ..default()
+                                },
+                                LeaderboardMarker::Score,
+                            ));
+                        });
+                });
 
             parent
                 .spawn(NodeBundle {
                     style: Style {
-                        flex_direction: FlexDirection::Row,
+                        margin: UiRect::new(Val::Px(15.0), Val::Auto, Val::Px(10.0), Val::Auto),
                         justify_content: JustifyContent::Start,
                         align_items: AlignItems::Start,
-                        margin: UiRect::px(5.0, 0.0, 0.0, 0.0),
+                        flex_direction: FlexDirection::Column,
+                        //border: UiRect::all(Val::Px(30.0)),
                         ..default()
                     },
+                    background_color: BACKGROUND_COLOR.into(),
                     ..default()
                 })
-                .with_children(|parent| {
-                    parent.spawn((
-                        NodeBundle {
-                            style: Style {
-                                min_width: Val::Px(30.0),
-                                max_width: Val::Px(60.0),
-                                flex_direction: FlexDirection::Column,
-                                justify_content: JustifyContent::Start,
-                                align_items: AlignItems::Start,
-                                margin: UiRect::top(Val::Px(10.0)),
-                                ..default()
+                .with_children(|parent02| {
+                    parent02.spawn(
+                        TextBundle::from_section(
+                            "Game Status",
+                            TextStyle {
+                                font: loaded_assets.pixel_font_handle.clone(),
+                                font_size: 16.0,
+                                color: TEXT_COLOR,
                             },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::px(10.0, 10.0, 5.0, 5.0),
+                            ..default()
+                        }),
+                    );
 
-                            ..default()
-                        },
-                        LeaderboardMarker::Number,
-                    ));
-                    parent.spawn((
-                        NodeBundle {
-                            style: Style {
-                                min_width: Val::Px(150.0),
-                                max_width: Val::Px(200.0),
-                                flex_direction: FlexDirection::Column,
-                                justify_content: JustifyContent::Start,
-                                align_items: AlignItems::Start,
-                                margin: UiRect::top(Val::Px(10.0)),
+                    parent02.spawn((
+                        TextBundle::from_section(
+                            "Remaining Time: ",
+                            TextStyle {
+                                font_size: 15.0,
+                                color: TEXT_COLOR,
                                 ..default()
                             },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::px(10.0, 0.0, 5.0, 0.0),
+                            ..default()
+                        }),
+                        GameStatusWidget::RemainingTime,
+                    ));
 
-                            ..default()
-                        },
-                        LeaderboardMarker::Player,
-                    ));
-                    parent.spawn((
-                        NodeBundle {
-                            style: Style {
-                                min_width: Val::Px(30.0),
-                                max_width: Val::Px(150.0),
-                                flex_direction: FlexDirection::Column,
-                                justify_content: JustifyContent::Start,
-                                align_items: AlignItems::Start,
-                                margin: UiRect::top(Val::Px(10.0)),
+                    parent02.spawn((
+                        TextBundle::from_section(
+                            "Ducks Born: ",
+                            TextStyle {
+                                font_size: 15.0,
+                                color: TEXT_COLOR,
                                 ..default()
                             },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::px(10.0, 0.0, 5.0, 0.0),
                             ..default()
-                        },
-                        LeaderboardMarker::Score,
+                        }),
+                        GameStatusWidget::DucklingsBorn,
+                    ));
+
+                    parent02.spawn((
+                        TextBundle::from_section(
+                            "Ducks Alive: ",
+                            TextStyle {
+                                font_size: 15.0,
+                                color: TEXT_COLOR,
+                                ..default()
+                            },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::px(10.0, 0.0, 5.0, 4.0),
+                            ..default()
+                        }),
+                        GameStatusWidget::DucksAlive,
                     ));
                 });
         });

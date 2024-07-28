@@ -161,7 +161,7 @@ fn add_leaderboard_entry(
                             LeaderboardMarker::Score => 17.0,
                             LeaderboardMarker::Player => 17.0,
                         },
-                        color: ui::PRESSED_BUTTON,
+                        color: ui::YELLOW_TEXT,
                         ..default()
                     },
                 ));
@@ -218,7 +218,7 @@ fn add_leaderboard_entry(
                     LeaderboardMarker::Score => 17.0,
                     LeaderboardMarker::Player => 17.0,
                 },
-                color: ui::PRESSED_BUTTON,
+                color: ui::YELLOW_TEXT,
                 ..default()
             },
         ));
