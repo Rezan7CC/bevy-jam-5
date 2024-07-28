@@ -583,7 +583,7 @@ pub fn system_spawn_leaderboard_ui(
                             "Ducks Born: 0",
                             TextStyle {
                                 font_size: 15.0,
-                                color: TEXT_COLOR,
+                                color: YELLOW_TEXT,
                                 ..default()
                             },
                         )

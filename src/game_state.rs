@@ -1,4 +1,5 @@
-use crate::{leaderboard, player, spawning, ui};
+use crate::player::PlayerStats;
+use crate::{leaderboard, life_cycles, player, spawning, ui};
 use bevy::prelude::*;
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
@@ -24,6 +25,7 @@ pub fn system_restart_game(
 ) {
     current_threats.0 = 0;
     player_stats.score = 0;
+    player_stats.ducks_born = 0;
     player_stats.is_simulating = false;
     processed_leaderboard.last_player_score = 0;
 
@@ -66,6 +68,31 @@ pub fn system_update_remaining_time(
                 continue;
             }
             text.sections[0].value = "Remaining Time: Endless".to_string();
+        }
+    }
+}
+
+pub fn system_update_game_status_ui(
+    player_stats: Res<PlayerStats>,
+    mut game_status_widgets: Query<(&mut Text, &ui::GameStatusWidgets)>,
+    ducks_query: Query<
+        Entity,
+        Or<(
+            With<life_cycles::Duckling>,
+            With<life_cycles::Juvenile>,
+            With<life_cycles::Adult>,
+        )>,
+    >,
+) {
+    for (mut text, widget) in game_status_widgets.iter_mut() {
+        match *widget {
+            ui::GameStatusWidgets::DucklingsBorn => {
+                text.sections[0].value = format!("Ducks Born: {0}", player_stats.ducks_born);
+            }
+            ui::GameStatusWidgets::DucksAlive => {
+                text.sections[0].value = format!("Ducks Alive: {0}", ducks_query.iter().count());
+            }
+            _ => {}
         }
     }
 }
