@@ -16,7 +16,7 @@ pub fn system_start_soundtrack(asset_server: Res<AssetServer>, mut commands: Com
         AudioBundle {
             source: asset_server.load("audio/Soundtrack_edited.wav"),
             settings: PlaybackSettings {
-                volume: Volume::new(0.07),
+                volume: Volume::new(0.16),
                 mode: PlaybackMode::Loop,
                 ..default()
             },
