@@ -24,6 +24,8 @@ mod vfx;
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bevy_jornet::JornetPlugin;
+use bevy::winit::WinitWindows;
+use winit::window::Icon;
 //use bevy::input::common_conditions::input_just_pressed;
 
 fn main() {
@@ -40,7 +42,7 @@ fn main() {
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Duck Boids".to_string(),
+                        title: "Ducky Boids".to_string(),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -67,6 +69,7 @@ fn main() {
             Startup,
             (
                 setup,
+                system_set_window_icon,
                 leaderboard::system_setup_leaderboard,
                 spawning::load_assets,
                 ui::system_create_main_menu.after(spawning::load_assets),
@@ -179,4 +182,26 @@ fn main() {
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
+}
+
+fn system_set_window_icon(
+    // we have to use `NonSend` here
+    windows: NonSend<WinitWindows>,
+) {
+    // here we use the `image` crate to load our icon data from a png file
+    // this is not a very bevy-native solution, but it will do
+    let (icon_rgba, icon_width, icon_height) = {
+        let image = image::open("assets/duck_icon.png")
+            .expect("Failed to open icon path")
+            .into_rgba8();
+        let (width, height) = image.dimensions();
+        let rgba = image.into_raw();
+        (rgba, width, height)
+    };
+    let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
+
+    // do it for all windows
+    for window in windows.windows.values() {
+        window.set_window_icon(Some(icon.clone()));
+    }
 }
