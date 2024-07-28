@@ -4,6 +4,7 @@
 // Feel free to delete this line.
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
+mod audio;
 mod boid;
 mod breeding;
 mod cursor;
@@ -155,13 +156,17 @@ fn main() {
         .add_systems(
             OnEnter(game_state::GameState::Running),
             (
+                audio::system_start_soundtrack,
                 game_state::system_reset_remaining_time,
                 cursor::system_enable_game_cursor,
             ),
         )
         .add_systems(
             OnEnter(game_state::GameState::Paused),
-            (cursor::system_disable_game_cursor,),
+            (
+                audio::system_stop_soundtrack,
+                cursor::system_disable_game_cursor,
+            ),
         )
         .run();
 }

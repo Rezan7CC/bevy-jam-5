@@ -16,7 +16,8 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = "0.14"
+bevy = { version = "0.14", features = [ "wav" ] }
 bevy_jornet = "0.8.0"
+bevy_particle_systems = "0.13.0"
 rand = "0.8.5"
 uuid = "1.10.0"
