@@ -23,8 +23,8 @@ mod vfx;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
-use bevy_jornet::JornetPlugin;
 use bevy::winit::WinitWindows;
+use bevy_jornet::JornetPlugin;
 use winit::window::Icon;
 //use bevy::input::common_conditions::input_just_pressed;
 
