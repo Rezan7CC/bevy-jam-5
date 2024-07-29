@@ -14,7 +14,7 @@ impl Default for PlayerStats {
             score: 0,
             ducks_born: 0,
             is_simulating: false,
-            remaining_time: 300.0,
+            remaining_time: 240.0,
         }
     }
 }

@@ -568,7 +568,7 @@ pub fn system_spawn_leaderboard_ui(
 
                     parent02.spawn((
                         TextBundle::from_section(
-                            "Remaining Time: 300",
+                            "Remaining Time: 240",
                             TextStyle {
                                 font_size: 15.0,
                                 color: TEXT_COLOR,

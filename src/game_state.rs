@@ -37,7 +37,7 @@ pub fn system_reset_remaining_time(mut player_stats: ResMut<player::PlayerStats>
     if player_stats.is_simulating {
         return;
     }
-    player_stats.remaining_time = 300.0;
+    player_stats.remaining_time = 240.0;
 }
 
 pub fn system_update_remaining_time(

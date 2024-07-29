@@ -138,7 +138,7 @@ pub fn system_update_relationships(
 #[derive(Component, Default)]
 pub struct BreedingProgress(pub f32);
 
-pub const BREEDING_DURATION: f32 = 5.0 * crate::life_cycles::TIME_FACTOR;
+pub const BREEDING_DURATION: f32 = 4.0 * crate::life_cycles::TIME_FACTOR;
 
 pub fn system_breeding(
     time: Res<Time>,
