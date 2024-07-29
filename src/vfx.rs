@@ -32,10 +32,12 @@ pub fn spawn_duck_eaten_effect(
     start_color: Color,
 ) {
     let end_color = start_color.with_alpha(0.0);
-
+    let position = Transform::from_translation(world_position.extend(0.0));
+    
     commands.spawn((
         ParticleSystemBundle {
-            transform: Transform::from_translation(world_position.extend(0.)),
+            transform: position,
+            global_transform: GlobalTransform::from_translation(position.translation),
             particle_system: ParticleSystem {
                 texture: loaded_assets.feather_image.clone().into(),
                 spawn_rate_per_second: 0.0.into(),
@@ -69,9 +71,12 @@ pub fn spawn_duck_cycle_transition_effect(
 ) {
     let start_color = Color::srgba(0.8, 0.8, 0.8, 0.5);
     let end_color = start_color.with_alpha(0.0);
+    let position = Transform::from_translation(world_position.extend(5.0));
+    
     commands.spawn((
         ParticleSystemBundle {
-            transform: Transform::from_translation(world_position.extend(5.)),
+            transform: position,
+            global_transform: GlobalTransform::from_translation(position.translation),
             particle_system: ParticleSystem {
                 texture: loaded_assets.circle_image.clone().into(),
                 spawn_rate_per_second: 0.0.into(),
@@ -104,9 +109,12 @@ pub fn spawn_food_eaten_effect(
 ) {
     let start_color: Color = Color::srgba(0.65, 0.5, 0.4, 1.0);
     let end_color = start_color.with_alpha(0.0);
+    let position = Transform::from_translation(world_position.extend(0.0));
+    
     commands.spawn((
         ParticleSystemBundle {
-            transform: Transform::from_translation(world_position.extend(0.)),
+            transform: position,
+            global_transform: GlobalTransform::from_translation(position.translation),
             particle_system: ParticleSystem {
                 texture: loaded_assets.circle_image.clone().into(),
                 spawn_rate_per_second: 0.0.into(),
@@ -139,9 +147,12 @@ pub fn spawn_egg_hatched_effect(
 ) {
     let start_color: Color = Color::srgba(0.8, 0.6, 0.5, 1.0);
     let end_color = start_color.with_alpha(0.0);
+    let position = Transform::from_translation(world_position.extend(0.0));
+
     commands.spawn((
         ParticleSystemBundle {
-            transform: Transform::from_translation(world_position.extend(0.)),
+            transform: position,
+            global_transform: GlobalTransform::from_translation(position.translation),
             particle_system: ParticleSystem {
                 texture: loaded_assets.egg_shell_image.clone().into(),
                 spawn_rate_per_second: 0.0.into(),
