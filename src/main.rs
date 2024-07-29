@@ -95,6 +95,7 @@ fn main() {
         .add_systems(
             OnEnter(game_state::GameState::TimeOver),
             (
+                audio::system_play_time_over_sound,
                 ui::system_create_time_over_menu,
                 game_state::system_change_state_to_paused,
             ),

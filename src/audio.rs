@@ -31,6 +31,17 @@ pub fn system_stop_soundtrack(mut commands: Commands, query: Query<Entity, With<
     }
 }
 
+pub fn system_play_time_over_sound(asset_server: Res<AssetServer>, mut commands: Commands) {
+    commands.spawn(AudioBundle {
+        source: asset_server.load("audio/bonus-points-190035.mp3"),
+        settings: PlaybackSettings {
+            volume: Volume::new(0.2),
+            mode: PlaybackMode::Despawn,
+            ..default()
+        },
+    });
+}
+
 pub fn system_update_active_audio_sources(
     query: Query<Entity, With<AudioSource>>,
     mut active_audio_sources: ResMut<ActiveAudioSources>,
