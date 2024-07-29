@@ -14,7 +14,7 @@ pub struct ActiveAudioSources(pub i32);
 pub fn system_start_soundtrack(asset_server: Res<AssetServer>, mut commands: Commands) {
     commands.spawn((
         AudioBundle {
-            source: asset_server.load("audio/Soundtrack_edited.wav"),
+            source: asset_server.load("audio/Soundtrack_edited.mp3"),
             settings: PlaybackSettings {
                 volume: Volume::new(0.16),
                 mode: PlaybackMode::Loop,
