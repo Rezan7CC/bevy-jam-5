@@ -70,9 +70,10 @@ fn main() {
             Startup,
             (
                 setup,
-                system_set_window_icon,
                 leaderboard::system_setup_leaderboard,
                 spawning::load_assets,
+                #[cfg(not(all(feature = "webgl2", target_arch = "wasm32")))]
+                system_set_window_icon,
                 ui::system_create_main_menu.after(spawning::load_assets),
                 ui::system_spawn_leaderboard_ui.after(spawning::load_assets),
                 spawning::system_spawn_boids.after(spawning::load_assets),
@@ -185,6 +186,7 @@ fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 }
 
+#[cfg(not(all(feature = "webgl2", target_arch = "wasm32")))]
 fn system_set_window_icon(
     // we have to use `NonSend` here
     windows: NonSend<WinitWindows>,
